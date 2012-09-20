@@ -1,5 +1,5 @@
 module Test where
-import Graphics.Bucephalus.Core
+import Graphics.UI.Bucephalus.Core
 
 main = coreStart $ SubstancesCore testinit testmain testquit
 

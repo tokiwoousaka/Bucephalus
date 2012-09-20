@@ -4,7 +4,7 @@
 -- 
 ---------------------------------------------------------------------------------------------------
 
-module Graphics.Bucephalus.Core(
+module Graphics.UI.Bucephalus.Core(
   --型の提供
   ButtonsState(..),
   GameState(..),
