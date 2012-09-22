@@ -46,7 +46,7 @@ data ButtonsState = ButtonsState {
 -- 状態管理／ボタン押下状況も同時に受け渡す
 data GameState a = GameState {
   buttons    :: ButtonsState,
-  gameState  :: a
+  takeState  :: a
   }
 
 -- 処理するプログラム本体受け渡し
@@ -59,12 +59,55 @@ data SubstancesCore a = SubstancesCore {
 ---------------------------------------------------------------------------------------------------
 -- コア
 ---------------------------------------------------------------------------------------------------
+
 coreStart :: SubstancesCore a -> IO ()
-coreStart substances = putStrLn "Called coreStart function!" --TODO 処理記述
+coreStart substances = do
+  --初期化処理
+  initSDL
+  state <- initSC substances >>= return . GameState initButtonState
+  --メインループ
+  (_, final) <- SDL.getTicks >>= mainLoop (substances, state)
+  --終了
+  quitSC substances $ takeState final
+  quitSDL
+
+mainLoop :: (SubstancesCore a, GameState a) -> Word32 -> IO (SubstancesCore a, GameState a) 
+mainLoop (substances, state) ago = do
+  SDL.delay 1 --CPU負担軽減
+  --フレーム間隔を一定に保つ
+  t <- SDL.getTicks
+  if ago + 16 > t then mainLoop (substances, state) ago
+   else do
+    --ゲーム処理実行
+    ev <- SDL.pollEvent
+    nState <- mainSC substances $ state
+    --終了条件判定、再帰
+    if isQuit ev then return (substances, nState) else mainLoop (substances, nState) t
+
+  where
+    --終了条件判定
+    isQuit :: SDL.Event -> Bool
+    isQuit (SDL.KeyUp key) = SDL.symKey key == SDL.SDLK_ESCAPE --ESCキー押下
+    isQuit ev              = ev             == SDL.Quit        --画面が閉じられる
+    isQuit _               = False
+
+---------------------------------------------------------------------------------------------------
+--SDL初期化
+initSDL :: IO ()
+initSDL = do
+  SDL.init [SDL.InitEverything]
+  SDL.setVideoMode 640 480 32 [] 
+  return ()
+
+--終了
+quitSDL :: IO ()
+quitSDL = do
+  SDL.setVideoMode 640 480 32 [] 
+  SDL.quit
 
 ---------------------------------------------------------------------------------------------------
 -- ゲームボタン管理
 ---------------------------------------------------------------------------------------------------
-makeButtonState :: Maybe GameButton -> ButtonsState
-makeButtonState _ = ButtonsState 0 0 0 0 0 0 0 0 0 0
+initButtonState :: ButtonsState
+initButtonState = ButtonsState 0 0 0 0 0 0 0 0 0 0
 
