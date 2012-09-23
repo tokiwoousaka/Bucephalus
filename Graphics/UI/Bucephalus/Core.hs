@@ -44,34 +44,34 @@ data ButtonsState = ButtonsState {
   } deriving (Show, Eq)
 
 -- 状態管理／ボタン押下状況も同時に受け渡す
-data GameState a = GameState {
-  buttons    :: ButtonsState,
-  takeState  :: a
+data GameState b s = GameState {
+  buttons    :: b,
+  takeState  :: s
   }
 
 -- 処理するプログラム本体受け渡し
-data SubstancesCore a = SubstancesCore {
-  initSC :: IO a,
-  mainSC :: GameState a-> IO (GameState a),
-  quitSC :: a -> IO ()
+data SubstancesCore b s = SubstancesCore {
+  initSC :: IO s,
+  mainSC :: GameState b s -> IO (GameState b s),
+  quitSC :: s -> IO ()
   }
 
 ---------------------------------------------------------------------------------------------------
 -- コア
 ---------------------------------------------------------------------------------------------------
 
-coreStart :: SubstancesCore a -> IO ()
+coreStart :: SubstancesCore ButtonsState s -> IO () --TODO ButtonsStateを型変数にする
 coreStart substances = do
   --初期化処理
   initSDL
-  state <- initSC substances >>= return . GameState initButtonState
+  state <- initSC substances >>= return . GameState initButtonState --TODO 初期化関数外だし
   --メインループ
   (_, final) <- SDL.getTicks >>= mainLoop (substances, state)
   --終了
   quitSC substances $ takeState final
   quitSDL
 
-mainLoop :: (SubstancesCore a, GameState a) -> Word32 -> IO (SubstancesCore a, GameState a) 
+mainLoop :: (SubstancesCore b s, GameState b s) -> Word32 -> IO (SubstancesCore b s, GameState b s) 
 mainLoop (substances, state) ago = do
   SDL.delay 1 --CPU負担軽減
   --フレーム間隔を一定に保つ

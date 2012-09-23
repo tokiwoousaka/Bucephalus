@@ -1,25 +1,33 @@
 module Test where
 import Graphics.UI.Bucephalus.Core
 
-main = coreStart $ SubstancesCore testinit testmain testquit
+---------------------------------------------------------------------------------------------------
+--Bucephalus Core テストプログラム
+
+main = animationMain
 
 ---------------------------------------------------------------------------------------------------
+-- アニメーションテスト
+---------------------------------------------------------------------------------------------------
+
+animationMain :: IO ()
+animationMain = coreStart $ SubstancesCore {
+  initSC = return $ TestState 0,
+  mainSC = testmain,
+  quitSC = \_ -> putStrLn "Game finished!!"
+  }
+
+---------------------------------------------------------------------------------------------------
+-- 型定義
 
 data TestState = TestState Int deriving Show
-
 incSt :: TestState -> TestState
 incSt (TestState x) = TestState (x + 1)
 
 ---------------------------------------------------------------------------------------------------
 
-testinit :: IO TestState 
-testinit = return $ TestState 0
-
-testmain :: GameState TestState -> IO (GameState TestState)
+testmain :: GameState ButtonsState TestState -> IO (GameState ButtonsState TestState)
 testmain st = do
   s <- return $ takeState st
   print s
   return $ GameState (buttons st) (incSt s)
-
-testquit :: TestState -> IO ()
-testquit _ = putStrLn "Called quit function"
