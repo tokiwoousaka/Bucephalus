@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -fno-warn-overlapping-patterns #-}
+
 ---------------------------------------------------------------------------------------------------
 -- 
 -- Core Program in The Project Bucephalus (C)2012 Tokiwo Ousaka
@@ -14,9 +16,7 @@ module Graphics.UI.Bucephalus.Core(
   ) where
 
 --SDL関連
-import qualified Graphics.UI.SDL            as SDL
-import qualified Graphics.UI.SDL.Image      as SDLi
-import qualified Graphics.UI.SDL.Rotozoomer as SDLr
+import qualified Graphics.UI.SDL as SDL
 
 --Haskell標準
 import Data.Word (Word32)
@@ -60,11 +60,11 @@ data SubstancesCore b s = SubstancesCore {
 -- コア
 ---------------------------------------------------------------------------------------------------
 
-coreStart :: SubstancesCore ButtonsState s -> IO () --TODO ButtonsStateを型変数にする
+coreStart :: SubstancesCore ButtonsState s -> IO ()
 coreStart substances = do
   --初期化処理
   initSDL
-  state <- initSC substances >>= return . GameState initButtonState --TODO 初期化関数外だし
+  state <- initSC substances >>= return . GameState initButtonState
   --メインループ
   (_, final) <- SDL.getTicks >>= mainLoop (substances, state)
   --終了
@@ -101,9 +101,7 @@ initSDL = do
 
 --終了
 quitSDL :: IO ()
-quitSDL = do
-  SDL.setVideoMode 640 480 32 [] 
-  SDL.quit
+quitSDL = SDL.quit
 
 ---------------------------------------------------------------------------------------------------
 -- ゲームボタン管理
