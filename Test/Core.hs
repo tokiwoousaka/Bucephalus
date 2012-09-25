@@ -1,4 +1,4 @@
-module Test where
+module Core where
 import Graphics.UI.Bucephalus.Core
 import qualified Graphics.UI.SDL            as SDL
 import qualified Graphics.UI.SDL.Image      as SDLi
@@ -75,8 +75,8 @@ initAnimation = do
   return (onpu, 0)
 
 --主処理
-mainAnimation :: (GameState ButtonsState ([OnpuState], Integer)) 
-                  -> IO (GameState ButtonsState ([OnpuState], Integer))
+mainAnimation :: (GameState b ([OnpuState], Integer)) 
+                  -> IO (GameState b ([OnpuState], Integer))
 mainAnimation (GameState bs (onpu, cnt)) = do
   --データ取得
   screen <- SDL.getVideoSurface
