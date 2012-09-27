@@ -10,7 +10,10 @@ module Graphics.UI.Bucephalus.Core(
   GameState(..),
   SubstancesCore(..),
   --主処理
-  coreStart
+  coreStart,
+  --from Bucephalus.Type.Pads
+  StanderdPad(..)
   ) where
 
 import Graphics.UI.Bucephalus.Core.Core
+import Graphics.UI.Bucephalus.Type.Pads
