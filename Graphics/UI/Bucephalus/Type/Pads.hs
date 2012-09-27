@@ -1,5 +1,7 @@
 
 module Graphics.UI.Bucephalus.Type.Pads(
+  GamePad(..),
+  StanderdPad(..)
   ) where
 
 import qualified Graphics.UI.SDL as SDL
