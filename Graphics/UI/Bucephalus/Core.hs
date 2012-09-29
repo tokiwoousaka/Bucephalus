@@ -8,11 +8,11 @@
 module Graphics.UI.Bucephalus.Core(
   --型の提供
   GameState(..),
-  SubstancesCore(..),
   --主処理
   coreStart,
   --from Bucephalus.Type.Pads
-  StanderdPad(..)
+  StanderdPad(..),
+  padInit
   ) where
 
 import Graphics.UI.Bucephalus.Core.Core

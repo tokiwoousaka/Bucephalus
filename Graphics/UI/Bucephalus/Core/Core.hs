@@ -3,7 +3,6 @@
 module Graphics.UI.Bucephalus.Core.Core(
   --型の提供
   GameState(..),
-  SubstancesCore(..),
   --主処理
   coreStart
   ) where
@@ -21,48 +20,38 @@ import Data.Word (Word32)
 -- 型定義
 ---------------------------------------------------------------------------------------------------
 
--- 状態管理／ボタン押下状況も同時に受け渡す
-data GameState p s = GameState {
-  buttons    :: p,
-  takeState  :: s
-  }
-
--- 処理するプログラム本体受け渡し
-data SubstancesCore p s = SubstancesCore {
-  initSC :: IO s,
-  mainSC :: GameState p s -> IO (GameState p s),
-  quitSC :: s -> IO ()
-  }
+-- ゲームの状態定義
+class GameState s where
+  gameMainCore :: GamePad p => (p, s) -> IO s
+  gameQuitCore :: s -> IO ()
 
 ---------------------------------------------------------------------------------------------------
 -- コア
 ---------------------------------------------------------------------------------------------------
 
-coreStart :: GamePad p => SubstancesCore p s -> IO ()
-coreStart substances = do
+coreStart :: (GamePad p, GameState s) => p -> s -> IO ()
+coreStart defaultPad defaultState = do
   --初期化処理
   initSDL
-  state <- initSC substances >>= return . GameState padInit
   --メインループ
-  (_, final) <- SDL.getTicks >>= mainLoop (substances, state)
+  (_, final) <- SDL.getTicks >>= mainLoop (defaultPad, defaultState)
   --終了
-  quitSC substances $ takeState final
+  gameQuitCore final
   quitSDL
 
-mainLoop :: GamePad p => 
-  (SubstancesCore p s, GameState p s) -> Word32 -> IO (SubstancesCore p s, GameState p s) 
-mainLoop (substances, state@(GameState pad st)) ago = do
+mainLoop :: (GamePad p, GameState s) => (p, s) -> Word32 -> IO (p, s)
+mainLoop (pad, st) ago = do
   SDL.delay 1 --CPU負担軽減
   --フレーム間隔を一定に保つ
   t <- SDL.getTicks
-  if ago + 16 > t then mainLoop (substances, state) ago
+  if ago + 16 > t then mainLoop (pad, st) ago
    else do
     --ゲーム処理実行
     ev <- SDL.pollEvent
     nPad <- return $ interpretPadEvent pad ev
-    nState <- mainSC substances $ GameState nPad st
+    nState <- gameMainCore (nPad, st)
     --終了条件判定、再帰
-    if isQuit ev then return (substances, nState) else mainLoop (substances, nState) t
+    if isQuit ev then return (nPad, nState) else mainLoop (nPad, nState) t
 
   where
     --終了条件判定

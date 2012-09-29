@@ -8,7 +8,7 @@ import qualified Graphics.UI.SDL.Rotozoomer as SDLr
 --Bucephalus Core テストプログラム
 
 main :: IO ()
-main = testProgram 1
+main = testProgram 0 --引数切り替えて実行するテストを変える
 
 testProgram :: Int -> IO ()
 testProgram 0 = animationMain
@@ -86,17 +86,10 @@ getSurfaceSize sur = (SDL.surfaceGetWidth sur, SDL.surfaceGetHeight sur)
 -- アニメーションテスト
 ---------------------------------------------------------------------------------------------------
 
-animationMain :: IO ()
-animationMain = coreStart $ SubstancesCore {
-  initSC = initAnimation,
-  mainSC = mainAnimation,
-  quitSC = quitAnimation
-  }
-
----------------------------------------------------------------------------------------------------
+animationMain = initAnimation >>= coreStart (padInit :: StanderdPad)
 
 --初期化
-initAnimation :: IO ([OnpuState], Integer)
+initAnimation :: IO AnimationState
 initAnimation = do
   onpu <- sequence $ [
     initOnpuState (1 , 1 ) (0, 0) "Test/resources/OnpuG.png",
@@ -114,63 +107,56 @@ initAnimation = do
     initOnpuState (13, 13) (0, 0) "Test/resources/OnpuG.png",
     initOnpuState (14, 14) (0, 0) "Test/resources/OnpuB.png",
     initOnpuState (15, 15) (0, 0) "Test/resources/OnpuR.png"]
-  return (onpu, 0)
-
---主処理
-mainAnimation :: (GameState StanderdPad ([OnpuState], Integer)) 
-                  -> IO (GameState StanderdPad ([OnpuState], Integer))
-mainAnimation (GameState bs (onpu, cnt)) = do
-  --データ取得
-  screen <- SDL.getVideoSurface
-  nextCnt <- return $ vibration 25 cnt
-  --ズームサイズ
-  size <- return . (+1) $ (fromIntegral cnt) / 100
-  --描画
-  SDL.fillRect screen Nothing (SDL.Pixel 0)
-  mapM_ (blitOnpu size screen) onpu 
-  SDL.flip screen
-  --フレーム処理終了
-  nextState <- return (map (boundOnpu . moveOnpu) onpu, nextCnt)
-  return $ (GameState bs nextState)
- 
---終了処理
-quitAnimation :: ([OnpuState], Integer) -> IO ()
-quitAnimation (onpu, _) = mapM_ SDL.freeSurface $ map onpuSurface onpu
+  return $ AnimationState (onpu, 0)
 
 ---------------------------------------------------------------------------------------------------
--- キー／ゲームパッド入力テスト
----------------------------------------------------------------------------------------------------
+--型定義
+data AnimationState = AnimationState ([OnpuState], Integer)
+instance GameState AnimationState where
+  --主処理
+  gameMainCore (_, AnimationState (onpu, cnt)) = do
+    --データ取得
+    screen <- SDL.getVideoSurface
+    nextCnt <- return $ vibration 25 cnt
+    --ズームサイズ
+    size <- return . (+1) $ (fromIntegral cnt) / 100
+    --描画
+    SDL.fillRect screen Nothing (SDL.Pixel 0)
+    mapM_ (blitOnpu size screen) onpu 
+    SDL.flip screen
+    --フレーム処理終了
+    return $ AnimationState (map (boundOnpu . moveOnpu) onpu, nextCnt)
+   
+  --終了処理
+  gameQuitCore (AnimationState (onpu, _)) = mapM_ SDL.freeSurface $ map onpuSurface onpu
 
-padTestMain :: IO ()
-padTestMain = coreStart $ SubstancesCore {
-  initSC = initPadTest,
-  mainSC = mainPadTest,
-  quitSC = quitPadTest 
-  }
+-----------------------------------------------------------------------------------------------------
+---- キー／ゲームパッド入力テスト
+-----------------------------------------------------------------------------------------------------
 
----------------------------------------------------------------------------------------------------
+padTestMain = initPadTest >>= coreStart (padInit :: StanderdPad)
 
-initPadTest :: IO (OnpuState, Integer)
+initPadTest :: IO PadTestState 
 initPadTest = do
   onpu <- initOnpuState (0, 0) (0, 0) "Test/resources/OnpuG.png"
-  return (onpu, 0)
+  return $ PadTestState (onpu, 0)
 
-mainPadTest :: (GameState StanderdPad (OnpuState, Integer)) 
-                  -> IO (GameState StanderdPad (OnpuState, Integer))
-mainPadTest (GameState bs (onpu, cnt)) = do
-  --データ取得
-  screen <- SDL.getVideoSurface
-  nextCnt <- return $ vibration 25 cnt
-  --ズームサイズ
-  size <- return . (+1) $ (fromIntegral cnt) / 100
-  --描画
-  SDL.fillRect screen Nothing (SDL.Pixel 0)
-  blitOnpu size screen onpu 
-  SDL.flip screen
-  --フレーム処理終了
-  nextState <- return (boundOnpu . moveOnpu $ onpu, nextCnt)
-  return $ (GameState bs nextState)
+-----------------------------------------------------------------------------------------------------
 
---終了処理
-quitPadTest :: (OnpuState, Integer) -> IO ()
-quitPadTest (onpu, _) = SDL.freeSurface $ onpuSurface onpu
+data PadTestState = PadTestState (OnpuState, Integer)
+instance GameState PadTestState where
+  gameMainCore (bs, PadTestState (onpu, cnt)) = do
+    --データ取得
+    screen <- SDL.getVideoSurface
+    nextCnt <- return $ vibration 25 cnt
+    --ズームサイズ
+    size <- return . (+1) $ (fromIntegral cnt) / 100
+    --描画
+    SDL.fillRect screen Nothing (SDL.Pixel 0)
+    blitOnpu size screen onpu 
+    SDL.flip screen
+    --フレーム処理終了
+    return $ PadTestState (boundOnpu . moveOnpu $ onpu, nextCnt)
+  
+  --終了処理
+  gameQuitCore (PadTestState (onpu, _)) = SDL.freeSurface $ onpuSurface onpu
