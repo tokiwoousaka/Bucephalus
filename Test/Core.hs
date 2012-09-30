@@ -1,3 +1,5 @@
+{-# LANGUAGE MultiParamTypeClasses, FunctionalDependencies #-}
+
 module Core where
 import Graphics.UI.Bucephalus.Core
 import qualified Graphics.UI.SDL            as SDL
@@ -8,7 +10,7 @@ import qualified Graphics.UI.SDL.Rotozoomer as SDLr
 --Bucephalus Core テストプログラム
 
 main :: IO ()
-main = testProgram 0 --引数切り替えて実行するテストを変える
+main = testProgram 1 --引数切り替えて実行するテストを変える
 
 testProgram :: Int -> IO ()
 testProgram 0 = animationMain
@@ -112,7 +114,7 @@ initAnimation = do
 ---------------------------------------------------------------------------------------------------
 --型定義
 data AnimationState = AnimationState ([OnpuState], Integer)
-instance GameState AnimationState where
+instance GameState AnimationState StanderdPad where
   --主処理
   gameMainCore (_, AnimationState (onpu, cnt)) = do
     --データ取得
@@ -144,8 +146,8 @@ initPadTest = do
 -----------------------------------------------------------------------------------------------------
 
 data PadTestState = PadTestState (OnpuState, Integer)
-instance GameState PadTestState where
-  gameMainCore (bs, PadTestState (onpu, cnt)) = do
+instance GameState PadTestState StanderdPad where
+  gameMainCore (ps, PadTestState (onpu, cnt)) = do
     --データ取得
     screen <- SDL.getVideoSurface
     nextCnt <- return $ vibration 25 cnt
@@ -155,8 +157,13 @@ instance GameState PadTestState where
     SDL.fillRect screen Nothing (SDL.Pixel 0)
     blitOnpu size screen onpu 
     SDL.flip screen
+
+    nOnpu <- return $ onpu { onpuVector = mulVector.padToVector $ ps }
     --フレーム処理終了
-    return $ PadTestState (boundOnpu . moveOnpu $ onpu, nextCnt)
-  
+    return $ PadTestState (boundOnpu . moveOnpu $ nOnpu, nextCnt)
+
+      where mulVector (x, y) = (x * 3, y * 3)
+
   --終了処理
   gameQuitCore (PadTestState (onpu, _)) = SDL.freeSurface $ onpuSurface onpu
+

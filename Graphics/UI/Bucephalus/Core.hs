@@ -12,7 +12,8 @@ module Graphics.UI.Bucephalus.Core(
   coreStart,
   --from Bucephalus.Type.Pads
   StanderdPad(..),
-  padInit
+  padInit,
+  padToVector
   ) where
 
 import Graphics.UI.Bucephalus.Core.Core

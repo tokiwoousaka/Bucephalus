@@ -1,3 +1,4 @@
+{-# LANGUAGE MultiParamTypeClasses, FunctionalDependencies #-}
 {-# OPTIONS_GHC -fno-warn-overlapping-patterns #-}
 
 module Graphics.UI.Bucephalus.Core.Core(
@@ -21,15 +22,15 @@ import Data.Word (Word32)
 ---------------------------------------------------------------------------------------------------
 
 -- ゲームの状態定義
-class GameState s where
-  gameMainCore :: GamePad p => (p, s) -> IO s
+class GamePad p => GameState s p | s -> p where
+  gameMainCore :: (p, s) -> IO s
   gameQuitCore :: s -> IO ()
 
 ---------------------------------------------------------------------------------------------------
 -- コア
 ---------------------------------------------------------------------------------------------------
 
-coreStart :: (GamePad p, GameState s) => p -> s -> IO ()
+coreStart :: (GamePad p, GameState s p) => p -> s -> IO ()
 coreStart defaultPad defaultState = do
   --初期化処理
   initSDL
@@ -39,7 +40,7 @@ coreStart defaultPad defaultState = do
   gameQuitCore final
   quitSDL
 
-mainLoop :: (GamePad p, GameState s) => (p, s) -> Word32 -> IO (p, s)
+mainLoop :: (GamePad p, GameState s p) => (p, s) -> Word32 -> IO (p, s)
 mainLoop (pad, st) ago = do
   SDL.delay 1 --CPU負担軽減
   --フレーム間隔を一定に保つ
