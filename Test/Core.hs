@@ -5,16 +5,18 @@ import Graphics.UI.Bucephalus.Core
 import qualified Graphics.UI.SDL            as SDL
 import qualified Graphics.UI.SDL.Image      as SDLi
 import qualified Graphics.UI.SDL.Rotozoomer as SDLr
+import qualified Graphics.UI.SDL.Mixer      as SDLm
 
 ---------------------------------------------------------------------------------------------------
 --Bucephalus Core テストプログラム
 
 main :: IO ()
-main = testProgram 1 --引数切り替えて実行するテストを変える
+main = testProgram 2 --引数切り替えて実行するテストを変える
 
 testProgram :: Int -> IO ()
 testProgram 0 = animationMain
 testProgram 1 = padTestMain
+testProgram 2 = soundTestMain
 
 ---------------------------------------------------------------------------------------------------
 -- 型定義
@@ -88,7 +90,7 @@ getSurfaceSize sur = (SDL.surfaceGetWidth sur, SDL.surfaceGetHeight sur)
 -- アニメーションテスト
 ---------------------------------------------------------------------------------------------------
 
-animationMain = initAnimation >>= coreStart (padInit :: StanderdPad)
+animationMain = initAnimation >>= coreStart (padInit :: StandardPad)
 
 --初期化
 initAnimation :: IO AnimationState
@@ -114,7 +116,7 @@ initAnimation = do
 ---------------------------------------------------------------------------------------------------
 --型定義
 data AnimationState = AnimationState ([OnpuState], Integer)
-instance GameState AnimationState StanderdPad where
+instance GameState AnimationState StandardPad where
   --主処理
   gameMainCore (_, AnimationState (onpu, cnt)) = do
     --データ取得
@@ -136,7 +138,7 @@ instance GameState AnimationState StanderdPad where
 ---- キー／ゲームパッド入力テスト
 -----------------------------------------------------------------------------------------------------
 
-padTestMain = initPadTest >>= coreStart (padInit :: StanderdPad)
+padTestMain = initPadTest >>= coreStart padInit
 
 initPadTest :: IO PadTestState 
 initPadTest = do
@@ -146,7 +148,7 @@ initPadTest = do
 -----------------------------------------------------------------------------------------------------
 
 data PadTestState = PadTestState (OnpuState, Integer)
-instance GameState PadTestState StanderdPad where
+instance GameState PadTestState StandardPad where
   gameMainCore (ps, PadTestState (onpu, cnt)) = do
     --データ取得
     screen <- SDL.getVideoSurface
@@ -167,3 +169,74 @@ instance GameState PadTestState StanderdPad where
   --終了処理
   gameQuitCore (PadTestState (onpu, _)) = SDL.freeSurface $ onpuSurface onpu
 
+-----------------------------------------------------------------------------------------------------
+---- サウンド／BGMテスト
+-----------------------------------------------------------------------------------------------------
+
+soundTestMain :: IO ()
+soundTestMain = coreStart padInit $ SoundTestState Nothing
+
+-----------------------------------------------------------------------------------------------------
+
+--データ定義
+type OnpuSeState = (OnpuState, Integer, Int, StandardPad-> Integer, SDLm.Chunk)
+data SoundTestState = 
+  SoundTestState (Maybe (SDLm.Music, [OnpuSeState]))
+
+getOnpuSeList :: SoundTestState -> [OnpuSeState]
+getOnpuSeList (SoundTestState Nothing) = []
+getOnpuSeList (SoundTestState (Just (_, res))) = res
+
+setOnpuSeList :: SoundTestState -> [OnpuSeState] -> SoundTestState
+setOnpuSeList (SoundTestState (Just (mus, _))) st = SoundTestState (Just (mus, st))
+
+--主処理作成
+instance GameState SoundTestState StandardPad where
+  gameMainCore (ps, st) = do
+    --初期化
+    inited <- initSoundTestState st
+    --描画＆効果音再生
+    screen <- SDL.getVideoSurface
+    SDL.fillRect screen Nothing (SDL.Pixel 0)
+    nxOnpuList <- mapM (playSound screen ps) (getOnpuSeList inited)
+    SDL.flip screen
+    --フレーム処理終了
+    return $ setOnpuSeList inited nxOnpuList
+
+----------
+--状態初期化＆BGM再生開始
+initSoundTestState :: SoundTestState -> IO SoundTestState
+initSoundTestState (SoundTestState Nothing) = let
+  --固定値
+  stereo = 2
+  mixDefaultFrequency = 22050
+  --補助
+  initSeOnpu (x, y) getBtnf channel fName sName = do
+    chunk <- SDLm.loadWAV sName
+    initOnpuState (0, 0) (x, y) fName >>= \onpu -> return (onpu, 0, channel, getBtnf, chunk)
+  in do
+    SDLm.openAudio mixDefaultFrequency SDLm.AudioS16Sys stereo 1024
+    --サウンド／画像読み込み
+    seOnpuList <- sequence $ [
+      initSeOnpu (20 , 140) buttonA     1 "Test/resources/OnpuR.png" "Test/resources/se2.wav",
+      initSeOnpu (145, 240) buttonB     1 "Test/resources/OnpuB.png" "Test/resources/se1.wav",
+      initSeOnpu (320, 190) buttonLeft  2 "Test/resources/OnpuR.png" "Test/resources/se5.wav",
+      initSeOnpu (420, 90 ) buttonUp    3 "Test/resources/OnpuG.png" "Test/resources/se6.wav",
+      initSeOnpu (420, 290) buttonDown  4 "Test/resources/OnpuG.png" "Test/resources/se3.wav",
+      initSeOnpu (520, 190) buttonRight 5 "Test/resources/OnpuB.png" "Test/resources/se4.wav"]
+    --BGM再生
+    mus <- SDLm.loadMUS "Test/resources/BLIZZARD.ogg"
+    SDLm.playMusic mus (-1)
+    --返却
+    return $ SoundTestState (Just (mus, seOnpuList))
+initSoundTestState st = return st
+
+--描画×効果音再生
+playSound :: SDL.Surface -> StandardPad -> OnpuSeState -> IO OnpuSeState
+playSound screen ps (onpu, zoom, channel, getBtnf, chunk) = do
+  nzoom <- if getBtnf ps == 1 
+    then SDLm.playChannel channel chunk 0 >> return 100 else return zoom
+  size <- return . (+1) $ (fromIntegral nzoom) / 100
+  blitOnpu size screen onpu 
+  return (onpu, dec2Zero nzoom, channel, getBtnf, chunk)
+    where dec2Zero x = if x == 0 then 0 else x - 1
