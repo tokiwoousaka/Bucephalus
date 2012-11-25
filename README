@@ -1,7 +1,7 @@
 
 Project Bucephalus
 -------------------------------------------------------------------------------
-This is Bucephalus RPG development library in Haskell (C)2012~... Tokiwo Ousaka
+This is the Bucephalus RPG development library on the Haskell (C)2012~... Tokiwo Ousaka
 -------------------------------------------------------------------------------
 
 BucephalusライブラリはHaskellによるRPG開発のため、以下の機能を提供します。
@@ -36,6 +36,7 @@ BucephalusライブラリはHaskellによるRPG開発のため、以下の機能
 Graphics.UI.SDL
 Graphics.UI.SDL.Image
 Graphics.UI.SDL.Rotozoomer
+Graphics.UI.SDL.Mixer
 
 -------------------------------------------------------------------------------
 
