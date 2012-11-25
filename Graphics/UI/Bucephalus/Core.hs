@@ -11,7 +11,7 @@ module Graphics.UI.Bucephalus.Core(
   --主処理
   coreStart,
   --from Bucephalus.Type.Pads
-  StanderdPad(..),
+  StandardPad(..),
   padInit,
   padToVector
   ) where

@@ -1,7 +1,7 @@
 
 module Graphics.UI.Bucephalus.Type.Pads(
   GamePad(..),
-  StanderdPad(..),
+  StandardPad(..),
   padToVector
   ) where
 
@@ -19,7 +19,7 @@ class GamePad p where
 -- 基本的なゲームボタン型をデフォルトで提供
 ---------------------------------------------------------------------------------------------------
 
-data StanderdPad = StanderdPad {
+data StandardPad = StandardPad {
   buttonUp :: Integer,
   buttonDown :: Integer,
   buttonLeft :: Integer,
@@ -34,13 +34,13 @@ data StanderdPad = StanderdPad {
   buttonSelect :: Integer
   } deriving (Show, Eq)
 
-instance GamePad StanderdPad where
-  padInit = StanderdPad 0 0 0 0 0 0 0 0 0 0 0 0
+instance GamePad StandardPad where
+  padInit = StandardPad 0 0 0 0 0 0 0 0 0 0 0 0
 
   interpretPadEvent = standerdPadEvent.incrementPushTime
 
 --全てのボタンの押されている時間を加算
-incrementPushTime :: StanderdPad -> StanderdPad
+incrementPushTime :: StandardPad -> StandardPad
 incrementPushTime pad = pad {
   buttonUp     = incTime $ buttonUp pad,
   buttonDown   = incTime $ buttonDown pad,
@@ -61,7 +61,7 @@ incrementPushTime pad = pad {
 
 ---------------------------------------------------------------------------------------------------
 --押されたキーに応じてパッドの状態を変更して返す
-standerdPadEvent :: StanderdPad -> Event -> StanderdPad
+standerdPadEvent :: StandardPad -> Event -> StandardPad
 standerdPadEvent pad (KeyDown (Keysym key _ _)) = keyDownEvent pad key
 standerdPadEvent pad (KeyUp (Keysym key _ _))   = keyUpEvent pad key
 standerdPadEvent pad _                          = pad
@@ -69,36 +69,54 @@ standerdPadEvent pad _                          = pad
 ---------------------------------------------------------------------------------------------------
 -- キーが押された場合の処理
 
-keyDownEvent :: StanderdPad -> SDLKey -> StanderdPad
-keyDownEvent pad SDLK_DOWN  = pad { buttonDown  = 1 }
-keyDownEvent pad SDLK_UP    = pad { buttonUp    = 1 }
-keyDownEvent pad SDLK_LEFT  = pad { buttonLeft  = 1 }
-keyDownEvent pad SDLK_RIGHT = pad { buttonRight = 1 }
+keyDownEvent :: StandardPad -> SDLKey -> StandardPad
+keyDownEvent pad SDLK_DOWN   = pad { buttonDown   = 1 }
+keyDownEvent pad SDLK_UP     = pad { buttonUp     = 1 }
+keyDownEvent pad SDLK_LEFT   = pad { buttonLeft   = 1 }
+keyDownEvent pad SDLK_RIGHT  = pad { buttonRight  = 1 }
+keyDownEvent pad SDLK_z      = pad { buttonA      = 1 }
+keyDownEvent pad SDLK_x      = pad { buttonB      = 1 }
+keyDownEvent pad SDLK_c      = pad { buttonX      = 1 }
+keyDownEvent pad SDLK_v      = pad { buttonY      = 1 }
+keyDownEvent pad SDLK_a      = pad { buttonL      = 1 }
+keyDownEvent pad SDLK_s      = pad { buttonR      = 1 }
+keyDownEvent pad SDLK_RETURN = pad { buttonStart  = 1 }
+keyDownEvent pad SDLK_ESCAPE = pad { buttonSelect = 1 }
+keyDownEvent pad _           = pad
 
 ---------------------------------------------------------------------------------------------------
 -- キーが放された場合の処理
 
-keyUpEvent :: StanderdPad -> SDLKey -> StanderdPad
-keyUpEvent pad SDLK_DOWN  = pad { buttonDown  = 0 }
-keyUpEvent pad SDLK_UP    = pad { buttonUp    = 0 }
-keyUpEvent pad SDLK_LEFT  = pad { buttonLeft  = 0 }
-keyUpEvent pad SDLK_RIGHT = pad { buttonRight = 0 }
+keyUpEvent :: StandardPad -> SDLKey -> StandardPad
+keyUpEvent pad SDLK_DOWN   = pad { buttonDown   = 0 }
+keyUpEvent pad SDLK_UP     = pad { buttonUp     = 0 }
+keyUpEvent pad SDLK_LEFT   = pad { buttonLeft   = 0 }
+keyUpEvent pad SDLK_RIGHT  = pad { buttonRight  = 0 }
+keyUpEvent pad SDLK_z      = pad { buttonA      = 0 }
+keyUpEvent pad SDLK_x      = pad { buttonB      = 0 }
+keyUpEvent pad SDLK_c      = pad { buttonX      = 0 }
+keyUpEvent pad SDLK_v      = pad { buttonY      = 0 }
+keyUpEvent pad SDLK_a      = pad { buttonL      = 0 }
+keyUpEvent pad SDLK_s      = pad { buttonR      = 0 }
+keyUpEvent pad SDLK_RETURN = pad { buttonStart  = 0 }
+keyUpEvent pad SDLK_ESCAPE = pad { buttonSelect = 0 }
+keyUpEvent pad _           = pad
 
 ---------------------------------------------------------------------------------------------------
--- StanderdPad ユーティリティ
+-- StandardPad ユーティリティ
 ---------------------------------------------------------------------------------------------------
 
 --押されてる矢印ボタンの状態からベクタ取得
-padToVector :: StanderdPad -> (Int, Int)
+padToVector :: StandardPad -> (Int, Int)
 padToVector pad = (leftright pad, updown pad)
      
-updown :: StanderdPad -> Int
+updown :: StandardPad -> Int
 updown pad 
   | buttonUp pad > 0   = -1
   | buttonDown pad > 0 = 1
   | otherwise          = 0
 
-leftright :: StanderdPad -> Int
+leftright :: StandardPad -> Int
 leftright pad 
   | buttonLeft  pad > 0 = -1
   | buttonRight pad > 0 = 1
