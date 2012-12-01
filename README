@@ -8,7 +8,7 @@ This is the Bucephalus RPG development library on the Haskell
 Project Bucephalusは、SDLをベースとして、HaskellによるRPG開発を行うための、
 フレームワーク開発プロジェクトです。
 
-BucephalusライブラリはHaskellによるRPG開発のため、以下の機能を提供します。
+当ライブラリは、以下の機能を提供します。
 
 　・　マップの描画エンジン
 　・　レベルエディタ
