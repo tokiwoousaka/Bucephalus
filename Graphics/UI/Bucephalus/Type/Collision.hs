@@ -1,5 +1,6 @@
 module Graphics.UI.Bucephalus.Type.Collision(
-  Point(..)
+  Point(..),
+  Collision(..)
   ) where
 
 ---------------------------------------------------------------------------------------------------
@@ -9,9 +10,11 @@ module Graphics.UI.Bucephalus.Type.Collision(
 class Collision c where
   collision :: c -> c -> Bool
 
-
 ---------------------------------------------------------------------------------------------------
 -- 点と点の当たり判定
 
 --型定義
 data Point a = Point (a, a) deriving (Show, Read)
+
+instance Collision (Point a) where
+  collision l r = undefined
