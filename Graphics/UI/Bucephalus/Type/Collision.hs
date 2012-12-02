@@ -1,3 +1,17 @@
-module Graphics.UI.Bucephalus.Type.Collision(test) where
+module Graphics.UI.Bucephalus.Type.Collision(
+  Point(..)
+  ) where
 
-test = "Test Function Called"
+---------------------------------------------------------------------------------------------------
+-- 当たり判定型クラス、Bucephalus向けに当たり判定処理を提供する	
+---------------------------------------------------------------------------------------------------
+
+class Collision c where
+  collision :: c -> c -> Bool
+
+
+---------------------------------------------------------------------------------------------------
+-- 点と点の当たり判定
+
+--型定義
+data Point a = Point (a, a) deriving (Show, Read)
