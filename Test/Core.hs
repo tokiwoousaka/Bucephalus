@@ -11,7 +11,7 @@ import qualified Graphics.UI.SDL.Mixer      as SDLm
 --Bucephalus Core テストプログラム
 
 main :: IO ()
-main = testProgram 2 --引数切り替えて実行するテストを変える
+main = testProgram 0 --引数切り替えて実行するテストを変える
 
 testProgram :: Int -> IO ()
 testProgram 0 = animationMain
