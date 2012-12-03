@@ -1,7 +1,9 @@
 
 module Graphics.UI.Bucephalus.Base.Object(
-    
+  GameObject(..)
   ) where
 import Graphics.UI.Bucephalus.Type.Collision
-import qualified Graphics.UI.SDL as SDL
+import Graphics.UI.Bucephalus.Type.Surface
 
+class GameObject o where
+  drawObject :: GameField -> o ->  IO ()
