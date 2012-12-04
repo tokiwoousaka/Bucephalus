@@ -6,7 +6,11 @@
 ---------------------------------------------------------------------------------------------------
 
 module Graphics.UI.Bucephalus.Base(
-
+  -- from Base.Object
+  ObjectState(..),
+  GameObject(..),
+  StandardObjectState(..),
+  StandardGameObject(..)
   ) where
 
 import Graphics.UI.Bucephalus.Base.Base
