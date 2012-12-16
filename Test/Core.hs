@@ -11,7 +11,7 @@ import qualified Graphics.UI.SDL.Mixer      as SDLm
 --Bucephalus Core テストプログラム
 
 main :: IO ()
-main = testProgram 0 --引数切り替えて実行するテストを変える
+main = testProgram 2 --引数切り替えて実行するテストを変える
 
 testProgram :: Int -> IO ()
 testProgram 0 = animationMain
@@ -213,7 +213,8 @@ initSoundTestState (SoundTestState Nothing) = let
   --補助
   initSeOnpu (x, y) getBtnf channel fName sName = do
     chunk <- SDLm.loadWAV sName
-    initOnpuState (0, 0) (x, y) fName >>= \onpu -> return (onpu, 0, channel, getBtnf, chunk)
+    onpu <- initOnpuState (0, 0) (x, y) fName 
+    return (onpu, 0, channel, getBtnf, chunk)
   in do
     SDLm.openAudio mixDefaultFrequency SDLm.AudioS16Sys stereo 1024
     --サウンド／画像読み込み
@@ -227,7 +228,7 @@ initSoundTestState (SoundTestState Nothing) = let
     --BGM再生
     mus <- SDLm.loadMUS "Test/resources/BLIZZARD.ogg"
     SDLm.playMusic mus (-1)
-    --返却
+    -返却
     return $ SoundTestState (Just (mus, seOnpuList))
 initSoundTestState st = return st
 

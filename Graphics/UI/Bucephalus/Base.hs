@@ -8,9 +8,8 @@
 module Graphics.UI.Bucephalus.Base(
   -- from Base.Object
   ObjectState(..),
-  GameObject(..),
   StandardObjectState(..),
-  StandardGameObject(..)
+  --StandardGameObject(..)
   ) where
 
 import Graphics.UI.Bucephalus.Base.Base
