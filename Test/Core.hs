@@ -228,7 +228,7 @@ initSoundTestState (SoundTestState Nothing) = let
     --BGM再生
     mus <- SDLm.loadMUS "Test/resources/BLIZZARD.ogg"
     SDLm.playMusic mus (-1)
-    -返却
+    --返却
     return $ SoundTestState (Just (mus, seOnpuList))
 initSoundTestState st = return st
 
