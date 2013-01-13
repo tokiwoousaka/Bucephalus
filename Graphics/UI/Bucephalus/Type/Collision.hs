@@ -5,6 +5,7 @@ module Graphics.UI.Bucephalus.Type.Collision(
   --当たり判定枠提供
   Point(..),
   Rectangle(..),
+  Shape(..),
   --当たり判定タイプ
   StandardCollisionType(..)
   ) where
@@ -21,9 +22,8 @@ class Collision c where
 class CollisionType t where
   canOverlap :: t -> t -> Bool
 
---instance Collision Point where
-  --collision :: Point -> Point -> Bool
-  
+---------------------------------------------------------------------------------------------------
+-- 個々の当たり判定インスタンスの作成
 ---------------------------------------------------------------------------------------------------
 -- 点と点の当たり判定
 
@@ -44,6 +44,18 @@ instance Collision Rectangle where
     (Rectangle (x0, y0) (x1, y1)) = rect1
     (Rectangle (x2, y2) (x3, y3)) = rect2
     in (x0 < x3 && x2 < x1)&&(y0 < y3 && y2 < y1)
+
+---------------------------------------------------------------------------------------------------
+-- Shape型 各々の形状を統合した型
+---------------------------------------------------------------------------------------------------
+
+data Shape = ShapeRectangle Rectangle deriving (Show, Read, Eq)
+
+instance Collision Shape where
+  --同型同士の当たり判定
+  (ShapeRectangle l) `collision` (ShapeRectangle r) = l `collision` r
+
+---------------------------------------------------------------------------------------------------
 
 ---------------------------------------------------------------------------------------------------
 -- 基本的な当たり判定タイプを標準で提供

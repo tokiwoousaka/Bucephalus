@@ -1,8 +1,7 @@
 
 module Graphics.UI.Bucephalus.Base.Object(
   ObjectState(..),
-  StandardObjectState(..),
-  --StandardGameObject(..)
+  StandardObjectState(..)
   ) where
 import Graphics.UI.Bucephalus.Type.Collision
 import Graphics.UI.Bucephalus.Type.Surface
@@ -11,16 +10,27 @@ import Graphics.UI.Bucephalus.Type.Surface
 import Control.Monad.Instances
 
 ---------------------------------------------------------------------------------------------------
--- Object型クラス ゲーム内で状態として受け渡されるキャラクターや障害物のようなオブジェクト
+-- ObjectState型クラス ゲーム内で状態として受け渡されるキャラクターや障害物のようなオブジェクト
 ---------------------------------------------------------------------------------------------------
 
-class ObjectState o where
+class (Collision o, CollisionType o) => ObjectState o where
   drawObject :: GameField -> o ->  IO ()
 
 ---------------------------------------------------------------------------------------------------
 -- 最低限の機能を持つObjectを標準で提供
 ---------------------------------------------------------------------------------------------------
 
-data StandardObjectState = StandardObjectState String deriving (Show, Read)
-instance ObjectState StandardObjectState where
-  drawObject _ (StandardObjectState o) = putStrLn $ "Draw Object : " ++ o
+data StandardObjectState t = StandardObjectState {
+  objectShape :: Shape,
+  objectType :: t
+  } deriving (Show, Read)
+
+--当たり判定関連の型クラスインスタンス
+instance Collision (StandardObjectState t) where
+  l `collision` r = objectShape l `collision` objectShape r
+instance CollisionType t => CollisionType (StandardObjectState t) where
+  l `canOverlap` r = objectType l `canOverlap` objectType r
+
+--オブジェクト型クラスのインスタンス
+instance (Show t, CollisionType t) => ObjectState (StandardObjectState t) where
+  drawObject _ o = putStrLn $ "Draw Object : " ++ show o
