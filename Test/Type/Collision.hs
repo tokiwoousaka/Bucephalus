@@ -1,6 +1,32 @@
-module Main where 
+module Test.Type.Collision(allCollisionTests) where 
+
+import Test.HUnit
 import Graphics.UI.Bucephalus.Type.Collision
 
+---------------------------------------------------------------------------------------------------
+
+--四角形の当たり判定テスト
+rectCollisionTests :: Test
+rectCollisionTests = "Rectangle collision tests" ~: test [
+  --テストケース１ ■leftの右下の点が■rightに入りこんでいる場合のテスト
+  "Case01" ~: (Rectangle (10,10) (70,70)) `collision` (Rectangle (25,25) (100,100)) ~=? True ,
+  --テストケース２　■leftに■rightが内包されている場合のテスト
+  "Case02" ~: (Rectangle (-100,-80) (70,10)) `collision` (Rectangle (0,0) (50,40)) ~=? True ,
+  --テストケース３　■leftと■rightが横方向に隣り合いぶつかっていない場合のテスト
+  "Case03" ~: (Rectangle (-110,0) (-60,50)) `collision` (Rectangle (-50,0) (0,50)) ~=? False ]
+
+---------------------------------------------------------------------------------------------------
+
+--全テスト
+allCollisionTests :: Test
+allCollisionTests = "Collision tests" ~: test [rectCollisionTests]
+
+--main関数・・・テスト実行
+main :: IO ()
+main = runTestTT allCollisionTests >> return ()
+
+---------------------------------------------------------------------------------------------------
+-- 旧テスト要削除
 ---------------------------------------------------------------------------------------------------
 
  --テストケース１ ■leftの右下の点が■rightに入りこんでいる場合のテスト
