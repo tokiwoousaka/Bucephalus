@@ -5,10 +5,14 @@ module Graphics.UI.Bucephalus.Core.Core(
   --型の提供
   GameState(..),
   --主処理
-  coreStart
+  coreStart,
+  --Config
+  CoreConf(..),
+  defaultCoreConf
   ) where
 
 --Bucephalusモジュール
+import Graphics.UI.Bucephalus.Core.CoreConf
 import Graphics.UI.Bucephalus.Type.Pads
 
 --SDL関連
@@ -32,10 +36,10 @@ class GamePad p => GameState s p | s -> p where
 -- コア
 ---------------------------------------------------------------------------------------------------
 
-coreStart :: (GamePad p, GameState s p) => p -> s -> IO ()
-coreStart defaultPad defaultState = do
+coreStart :: (GamePad p, GameState s p) => CoreConf -> p -> s -> IO ()
+coreStart conf defaultPad defaultState = do
   --初期化処理
-  initSDL
+  initSDL conf
   --メインループ
   (_, final) <- SDL.getTicks >>= mainLoop (defaultPad, defaultState)
   --終了
@@ -65,11 +69,13 @@ mainLoop (pad, st) ago = do
 
 ---------------------------------------------------------------------------------------------------
 --SDL初期化
-initSDL :: IO ()
-initSDL = do
-  SDL.init [SDL.InitEverything]
-  SDL.setVideoMode 640 480 32 [] 
-  return ()
+initSDL :: CoreConf -> IO ()
+initSDL conf = let
+  surfaceFlags = if fullScreen conf then [SDL.Fullscreen] else []
+  in do
+    SDL.init [SDL.InitEverything]
+    SDL.setVideoMode 640 480 32 surfaceFlags
+    return ()
 
 --終了
 quitSDL :: IO ()

@@ -90,7 +90,7 @@ getSurfaceSize sur = (SDL.surfaceGetWidth sur, SDL.surfaceGetHeight sur)
 -- アニメーションテスト
 ---------------------------------------------------------------------------------------------------
 
-animationMain = initAnimation >>= coreStart (padInit :: StandardPad)
+animationMain = initAnimation >>= coreStart defaultCoreConf (padInit :: StandardPad)
 
 --初期化
 initAnimation :: IO AnimationState
@@ -138,7 +138,7 @@ instance GameState AnimationState StandardPad where
 ---- キー／ゲームパッド入力テスト
 -----------------------------------------------------------------------------------------------------
 
-padTestMain = initPadTest >>= coreStart padInit
+padTestMain = initPadTest >>= coreStart defaultCoreConf padInit 
 
 initPadTest :: IO PadTestState 
 initPadTest = do
@@ -174,7 +174,7 @@ instance GameState PadTestState StandardPad where
 -----------------------------------------------------------------------------------------------------
 
 soundTestMain :: IO ()
-soundTestMain = coreStart padInit $ SoundTestState Nothing
+soundTestMain = coreStart (defaultCoreConf {fullScreen = True})padInit $ SoundTestState Nothing
 
 -----------------------------------------------------------------------------------------------------
 

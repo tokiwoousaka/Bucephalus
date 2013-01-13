@@ -13,7 +13,10 @@ module Graphics.UI.Bucephalus.Core(
   --from Bucephalus.Type.Pads
   StandardPad(..),
   padInit,
-  padToVector
+  padToVector,
+  --Config
+  CoreConf(..),
+  defaultCoreConf
   ) where
 
 import Graphics.UI.Bucephalus.Core.Core
