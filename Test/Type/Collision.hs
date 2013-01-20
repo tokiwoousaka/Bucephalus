@@ -9,7 +9,7 @@ import Graphics.UI.Bucephalus.Type.Collision
 rectCollisionTests :: Test
 rectCollisionTests = "Rectangle collision tests" ~: test [
   --テストケース１ ■leftの右下の点が■rightに入りこんでいる場合のテスト
-  "Case01" ~: (Rectangle (10,10) (70,70)) `collision` (Rectangle (25,25) (100,100)) ~=? True ,
+  "Case01" ~: (Rectangle (10,10) (70,70)) `collision` (Rectangle (25,25) (100,100)) ~=? True,
   --テストケース２　■leftに■rightが内包されている場合のテスト
   "Case02" ~: (Rectangle (-100,-80) (70,10)) `collision` (Rectangle (0,0) (50,40)) ~=? True ,
   --テストケース３　■leftと■rightが横方向に隣り合いぶつかっていない場合のテスト

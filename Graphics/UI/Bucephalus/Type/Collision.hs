@@ -64,10 +64,11 @@ instance Collision Rectangle where
 -- Shape型 各々の形状を統合した型
 ---------------------------------------------------------------------------------------------------
 
-data Shape = ShapeRectangle Rectangle deriving (Show, Read, Eq)
+data Shape = ShapePoint Point | ShapeRectangle Rectangle deriving (Show, Read, Eq)
 
 instance Collision Shape where
   --同型同士の当たり判定
+  (ShapePoint l) `collision` (ShapePoint r) = l `collision` r
   (ShapeRectangle l) `collision` (ShapeRectangle r) = l `collision` r
 
 ---------------------------------------------------------------------------------------------------
