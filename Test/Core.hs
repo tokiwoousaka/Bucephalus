@@ -174,7 +174,7 @@ instance GameState PadTestState StandardPad where
 -----------------------------------------------------------------------------------------------------
 
 soundTestMain :: IO ()
-soundTestMain = coreStart (defaultCoreConf {fullScreen = True})padInit $ SoundTestState Nothing
+soundTestMain = coreStart defaultCoreConf padInit $ SoundTestState Nothing
 
 -----------------------------------------------------------------------------------------------------
 
