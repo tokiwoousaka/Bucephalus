@@ -7,7 +7,6 @@
 
 module Graphics.UI.Bucephalus.Base(
   -- from Base.Object
-  ObjectState(..),
   --StandardGameObject(..)
   ) where
 

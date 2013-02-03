@@ -1,5 +1,5 @@
-{- |
-module      :  Graphics.UI.Bucephalus
+{-|
+Module      :  Graphics.UI.Bucephalus
 Copyright   :  (C) 2012 Tokiwo Ousaka
 -}
 

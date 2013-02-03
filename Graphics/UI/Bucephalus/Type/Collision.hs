@@ -2,7 +2,7 @@ module Graphics.UI.Bucephalus.Type.Collision(
   --型クラス
   Collision(..),
   CollisionType(..),
-  CollisionSet(..),
+  --CollisionSet(..), --廃止？
   --当たり判定枠提供
   Point(..),
   Rectangle(..),
@@ -10,9 +10,10 @@ module Graphics.UI.Bucephalus.Type.Collision(
   --当たり判定タイプ
   StandardCollisionType(..),
   --当たり判定コレクション
-  StandardCollisionSet(..)
+  --StandardCollisionSet(..) --廃止？
   ) where
 
+import Data.List
 --(,) a をFunctorとして利用する
 import Control.Monad.Instances
 
@@ -28,12 +29,11 @@ class Collision c where
 class CollisionType t where
   canOverlap :: t -> t -> Bool 
 
---当たり判定コレクション、複数の(Collision, CollisionType)のペアを一括で扱う
-class CollisionSet c where
-  --CollisionType別全ての衝突判定
-  collisionA :: CollisionType t => c -> c -> [(t, t)] 
-  --canOverlap = Falseの組み合わせのみ判定
-  collisionC :: CollisionType t => c -> c -> [(t, t)]
+----TODO 考え中
+--当たり判定セット、CollisionとCollisionTypeを包括
+--class Collision c => CollisionSet c where
+--  collisionTypeFrom :: CollisionType a => c a b -> a
+--  collisionFrom :: Collision b => c a b -> b
 
 ---------------------------------------------------------------------------------------------------
 -- 個々の当たり判定インスタンスの作成
@@ -44,8 +44,7 @@ class CollisionSet c where
 data Point = Point (Int, Int) deriving (Show, Read, Eq)
 
 --インスタンス作成 
-instance Collision Point where
-  collision l r = l == r 
+instance Collision Point where collision l r = l == r 
  
 ---------------------------------------------------------------------------------------------------
 -- 四角形と四角形の当たり判定
@@ -61,9 +60,10 @@ instance Collision Rectangle where
     in (x0 < x3 && x2 < x1)&&(y0 < y3 && y2 < y1)
 
 ---------------------------------------------------------------------------------------------------
--- Shape型 各々の形状を統合した型
+-- 当たり判定枠統合
 ---------------------------------------------------------------------------------------------------
 
+-- Shape型 各々の形状を統合した型
 data Shape = ShapePoint Point | ShapeRectangle Rectangle deriving (Show, Read, Eq)
 
 instance Collision Shape where
@@ -72,7 +72,7 @@ instance Collision Shape where
   (ShapeRectangle l) `collision` (ShapeRectangle r) = l `collision` r
 
 ---------------------------------------------------------------------------------------------------
--- 基本的な当たり判定タイプを標準で提供
+-- 基本的な型を標準で提供
 ---------------------------------------------------------------------------------------------------
 --通常のマップ用当たり判定枠
 
@@ -84,6 +84,7 @@ data StandardCollisionType =
 instance CollisionType StandardCollisionType where
   TypeWall `canOverlap` TypeChar = False
   TypeChar `canOverlap` TypeChar = False
+  TypeChar `canOverlap` x        = (flip canOverlap) x TypeChar
   _        `canOverlap` _        = True
 
 --unitをインスタンスにする事で、メニュー等の当たり判定タイプが不要な場合に対応
@@ -91,14 +92,16 @@ instance CollisionType () where
   _ `canOverlap` _ = True
 
 ---------------------------------------------------------------------------------------------------
--- 基本的なCollisionCollectionの型を標準で提供
----------------------------------------------------------------------------------------------------
 
---コレクションをリストで扱う
-data StandardCollisionSet t c = StandardCollisionSet [(t, c)]
+--Cliision型クラスインスタンスのリストもCollision型クラスインスタンス
+instance (Eq a, Collision a) => Collision [a] where
+  ls `collision` rs = all id . map (uncurry collision) $ nub [(l, r) | l <- ls, r <- rs]
 
-instance Functor (StandardCollisionSet t) where
-  fmap f (StandardCollisionSet x) = StandardCollisionSet $ fmap (fmap f) x
-instance CollisionSet (StandardCollisionSet t c) where
-  collisionC = undefined
-  collisionA = undefined
+----二値のタプルはCollisionSetのインスタンス
+instance Collision c => Collision ((,) t c) where
+  ls `collision` rs = snd ls `collision` snd rs
+----TODO 考え中
+--instance CollisionSet (,) where
+--  collisionTypeFrom xs = undefined
+--  collisionFrom x = snd x
+
