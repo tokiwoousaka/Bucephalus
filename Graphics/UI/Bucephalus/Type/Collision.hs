@@ -52,12 +52,25 @@ instance Collision Point where collision l r = l == r
 --型定義
 data Rectangle = Rectangle (Int, Int) (Int, Int) deriving (Show, Read, Eq)
 
---インスタンス作成 
+--インスタンス作成
 instance Collision Rectangle where
   collision rect1 rect2 = let
     (Rectangle (x0, y0) (x1, y1)) = rect1
     (Rectangle (x2, y2) (x3, y3)) = rect2
     in (x0 < x3 && x2 < x1)&&(y0 < y3 && y2 < y1)
+
+---------------------------------------------------------------------------------------------------
+-- 円と円の当たり判定
+ 
+--型定義
+data Circle = Circle (Int,Int) Int deriving (Show, Read, Eq)
+
+--インスタンス作成
+instance Collision Circle where
+  collision cir1 cir2 = let
+    (Circle (x0,y0) radius0) = cir1
+    (Circle (x1,y1) radius1) = cir2
+    in (x0 - x1)*(x0 - x1) + (y0 - y1)*(y0 - y1) <= (radius0 + radius1)*(radius0 + radius1)
 
 ---------------------------------------------------------------------------------------------------
 -- 当たり判定枠統合
