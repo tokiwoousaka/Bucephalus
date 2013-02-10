@@ -46,30 +46,55 @@ data Point = Point (Int, Int) deriving (Show, Read, Eq)
 --インスタンス作成 
 instance Collision Point where collision l r = l == r 
  
+ ---------------------------------------------------------------------------------------------------
+-- 線と線の当たり判定
+ 
+--型定義
+data Line = Line (Point, Point) deriving (Show, Read, Eq)
+
+-- インスタンス作成
+instance Collision Line　where
+  collision line1 line2 = let
+    (Line (point0, point1)) = line1
+    (Line (point2, point3)) = line2
+    (Point (x0, y0)) = point0
+    (Point (x1, y1)) = point1
+    (Point (x2, y2)) = point2
+    (Point (x3, y3)) = point3
+    line1StartEndPoint = (x0 - x1) * (y2 - y0) + (y0 - y1) * (x0 - x2)
+    line2StartEndPoint = (x0 - x1) * (y3 - y0) + (y0 - y1) * (x0 - x3) 
+    in line1StartEndPoint * line2StartEndPoint > 0
+        
 ---------------------------------------------------------------------------------------------------
 -- 四角形と四角形の当たり判定
  
 --型定義
-data Rectangle = Rectangle (Int, Int) (Int, Int) deriving (Show, Read, Eq)
+data Rectangle = Rectangle Point Point deriving (Show, Read, Eq)
 
 --インスタンス作成
 instance Collision Rectangle where
   collision rect1 rect2 = let
-    (Rectangle (x0, y0) (x1, y1)) = rect1
-    (Rectangle (x2, y2) (x3, y3)) = rect2
+    (Rectangle point0 point1) = rect1
+    (Rectangle point2 point3) = rect2
+    (Point (x0, y0)) = point0
+    (Point (x1, y1)) = point1
+    (Point (x2, y2)) = point2
+    (Point (x3, y3)) = point3
     in (x0 < x3 && x2 < x1)&&(y0 < y3 && y2 < y1)
 
 ---------------------------------------------------------------------------------------------------
 -- 円と円の当たり判定
  
 --型定義
-data Circle = Circle (Int,Int) Int deriving (Show, Read, Eq)
+data Circle = Circle Point Int deriving (Show, Read, Eq)
 
 --インスタンス作成
 instance Collision Circle where
   collision cir1 cir2 = let
-    (Circle (x0,y0) radius0) = cir1
-    (Circle (x1,y1) radius1) = cir2
+    (Circle point0 radius0) = cir1
+    (Circle point1 radius1) = cir2
+    (Point (x0, y0)) = point0
+    (Point (x1, y1)) = point1
     in (x0 - x1)*(x0 - x1) + (y0 - y1)*(y0 - y1) <= (radius0 + radius1)*(radius0 + radius1)
 
 ---------------------------------------------------------------------------------------------------
