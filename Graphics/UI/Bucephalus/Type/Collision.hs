@@ -29,7 +29,7 @@ class Collision c where
 class CollisionType t where
   canOverlap :: t -> t -> Bool 
 
-----TODO 考え中
+----TODO tokiwoousaka 考え中
 --当たり判定セット、CollisionとCollisionTypeを包括
 --class Collision c => CollisionSet c where
 --  collisionTypeFrom :: CollisionType a => c a b -> a
@@ -53,18 +53,24 @@ instance Collision Point where collision l r = l == r
 data Line = Line (Point, Point) deriving (Show, Read, Eq)
 
 -- インスタンス作成
-instance Collision Line　where
+instance Collision Line where
   collision line1 line2 = let
+    --パターンマッチで座標取り出し
     (Line (point0, point1)) = line1
     (Line (point2, point3)) = line2
     (Point (x0, y0)) = point0
     (Point (x1, y1)) = point1
     (Point (x2, y2)) = point2
     (Point (x3, y3)) = point3
-    line1StartEndPoint = (x0 - x1) * (y2 - y0) + (y0 - y1) * (x0 - x2)
-    line2StartEndPoint = (x0 - x1) * (y3 - y0) + (y0 - y1) * (x0 - x3) 
-    in line1StartEndPoint * line2StartEndPoint > 0
-        
+    --当たり判定計算式
+    --TODO tokiwoousaka アルゴリズム確認
+    startEndPoint px py = (x0 - x1) * (py - y0) + (y0 - y1) * (x0 - px)
+    in startEndPoint x2 y2 * startEndPoint x3 y3 > 0
+    --旧処理、SIwatsukiと内容確認した後削除
+    --line1StartEndPoint = (x0 - x1) * (y2 - y0) + (y0 - y1) * (x0 - x2)
+    --line2StartEndPoint = (x0 - x1) * (y3 - y0) + (y0 - y1) * (x0 - x3) 
+    --in line1StartEndPoint * line2StartEndPoint > 0
+
 ---------------------------------------------------------------------------------------------------
 -- 四角形と四角形の当たり判定
  
@@ -138,7 +144,7 @@ instance (Eq a, Collision a) => Collision [a] where
 ----二値のタプルはCollisionSetのインスタンス
 instance Collision c => Collision ((,) t c) where
   ls `collision` rs = snd ls `collision` snd rs
-----TODO 考え中
+----TODO tokiwoousaka 考え中
 --instance CollisionSet (,) where
 --  collisionTypeFrom xs = undefined
 --  collisionFrom x = snd x
