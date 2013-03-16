@@ -4,6 +4,10 @@ module Graphics.UI.Bucephalus.Base.Object(
 import Graphics.UI.Bucephalus.Type.Collision
 import Graphics.UI.Bucephalus.Type.Surface
 
----------------------------------------------------------------------------------------------------
--- 型宣言
----------------------------------------------------------------------------------------------------
+data Object c = Object {
+  objCollision :: c,
+  position :: (Int, Int)
+  }
+
+instance Collision c => Collision (Object c) where
+  l `collision` r = undefined --positionを意識した実装にする

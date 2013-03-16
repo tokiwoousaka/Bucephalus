@@ -1,21 +1,20 @@
+{-# LANGUAGE MultiParamTypeClasses, FunctionalDependencies, FlexibleInstances #-}
+
 module Graphics.UI.Bucephalus.Type.Collision(
   --型クラス
   Collision(..),
   CollisionType(..),
-  --CollisionSet(..), --廃止？
+  CollisionSet(..),
   --当たり判定枠提供
   Point(..),
   Rectangle(..),
   Shape(..),
-  --当たり判定タイプ
+  --当たり判定属性
   StandardCollisionType(..),
-  --当たり判定コレクション
-  --StandardCollisionSet(..) --廃止？
   ) where
 
-import Data.List
---(,) a をFunctorとして利用する
-import Control.Monad.Instances
+--Haskell標準
+import Data.List (nub)
 
 ---------------------------------------------------------------------------------------------------
 -- 型定義
@@ -29,11 +28,11 @@ class Collision c where
 class CollisionType t where
   canOverlap :: t -> t -> Bool 
 
-----TODO tokiwoousaka 考え中
+--TODO tokiwoousaka 考え中
 --当たり判定セット、CollisionとCollisionTypeを包括
---class Collision c => CollisionSet c where
---  collisionTypeFrom :: CollisionType a => c a b -> a
---  collisionFrom :: Collision b => c a b -> b
+class (Collision c) => CollisionSet c a b | c -> a , c -> b where
+  collisionTypeFrom :: c -> a
+  collisionFrom :: c -> b
 
 ---------------------------------------------------------------------------------------------------
 -- 個々の当たり判定インスタンスの作成
@@ -46,7 +45,7 @@ data Point = Point (Int, Int) deriving (Show, Read, Eq)
 --インスタンス作成 
 instance Collision Point where collision l r = l == r 
  
- ---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 -- 線と線の当たり判定
  
 --型定義
@@ -128,7 +127,7 @@ data StandardCollisionType =
 instance CollisionType StandardCollisionType where
   TypeWall `canOverlap` TypeChar = False
   TypeChar `canOverlap` TypeChar = False
-  TypeChar `canOverlap` x        = (flip canOverlap) x TypeChar
+  TypeChar `canOverlap` x        = x `canOverlap` TypeChar
   _        `canOverlap` _        = True
 
 --unitをインスタンスにする事で、メニュー等の当たり判定タイプが不要な場合に対応
@@ -144,8 +143,7 @@ instance (Eq a, Collision a) => Collision [a] where
 ----二値のタプルはCollisionSetのインスタンス
 instance Collision c => Collision ((,) t c) where
   ls `collision` rs = snd ls `collision` snd rs
-----TODO tokiwoousaka 考え中
---instance CollisionSet (,) where
---  collisionTypeFrom xs = undefined
---  collisionFrom x = snd x
+instance (CollisionType t, Collision c) => CollisionSet ((,) t c) t c  where
+  collisionTypeFrom x = fst x 
+  collisionFrom x = snd x
 
