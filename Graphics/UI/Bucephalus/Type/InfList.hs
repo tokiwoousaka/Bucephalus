@@ -1,5 +1,7 @@
 module Graphics.UI.Bucephalus.Type.InfList(
+  --型構成子をエクスポートしない事で安全性を保持
   List,
+  --操作するための関数
   fromList, 
   toList, 
   map,
@@ -9,12 +11,22 @@ module Graphics.UI.Bucephalus.Type.InfList(
   zip,
   zipWith) where
 
+--Preludeの隠蔽
 import qualified Prelude as PRE
-import Prelude (($))
+import Prelude (($), Maybe(..))
+
+---------------------------------------------------------------------------------------------------
+-- 型定義
+---------------------------------------------------------------------------------------------------
 
 data List a = List [a]
+
 instance PRE.Functor List where
   fmap = map
+
+---------------------------------------------------------------------------------------------------
+-- リストに対する基本的な操作
+---------------------------------------------------------------------------------------------------
 
 fromList :: [a] -> List a
 fromList x = List $ PRE.cycle x
@@ -28,8 +40,9 @@ map f (List x) = List $ PRE.map f x
 take :: PRE.Int -> List a -> [a]
 take i (List x) = PRE.take i x
 
-head :: List a -> a
-head (List x) = PRE.head x
+head :: List a -> Maybe a
+head (List []) = Nothing 
+head (List x) = Just $ PRE.head x
 
 tail :: List a -> List a
 tail (List x) = List $ PRE.tail x
