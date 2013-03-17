@@ -1,6 +1,6 @@
 
-module Graphics.UI.Bucephalus.Type.Movement where
-import Graphics.UI.Bucephalus.Type.Collision (Point(..))
+module Graphics.UI.Bucephalus.Type.Shape.Movement where
+import Graphics.UI.Bucephalus.Type.Shape.Collision (Point(..))
 
 ---------------------------------------------------------------------------------------------------
 -- 型定義

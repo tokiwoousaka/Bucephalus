@@ -1,6 +1,6 @@
 {-# LANGUAGE MultiParamTypeClasses, FunctionalDependencies, FlexibleInstances #-}
 
-module Graphics.UI.Bucephalus.Type.Collision(
+module Graphics.UI.Bucephalus.Type.Shape.Collision(
   --型クラス
   Collision(..),
   CollisionType(..),

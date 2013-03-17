@@ -1,7 +1,7 @@
-module Test.Type.Collision(allCollisionTests) where 
+module Test.Type.Shape.Collision(allCollisionTests) where 
 
 import Test.HUnit
-import Graphics.UI.Bucephalus.Type.Collision
+import Graphics.UI.Bucephalus.Type.Shape.Collision
 
 ---------------------------------------------------------------------------------------------------
 
