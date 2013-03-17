@@ -1,5 +1,8 @@
 
 module Graphics.UI.Bucephalus.Type.Shape.Movement where
+
+--Bucephalusモジュール
+import Graphics.UI.Bucephalus.Type.Shape.Shape 
 import Graphics.UI.Bucephalus.Type.Shape.Collision (Point(..))
 
 ---------------------------------------------------------------------------------------------------
@@ -13,5 +16,5 @@ class Movement m where
   moveByPoint (Point p) = move p
 
 ---------------------------------------------------------------------------------------------------
--- ShpeをMovementインスタンスにする
+-- 各Shpeデータ型をMovementインスタンスにする
 ---------------------------------------------------------------------------------------------------

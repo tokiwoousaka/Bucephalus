@@ -13,6 +13,9 @@ module Graphics.UI.Bucephalus.Type.Shape.Collision(
   StandardCollisionType(..),
   ) where
 
+--Bucephalusモジュール
+import Graphics.UI.Bucephalus.Type.Shape.Shape
+
 --Haskell標準
 import Data.List (nub)
 
@@ -28,30 +31,21 @@ class Collision c where
 class CollisionType t where
   canOverlap :: t -> t -> Bool 
 
---TODO tokiwoousaka 考え中
 --当たり判定セット、CollisionとCollisionTypeを包括
 class (Collision c) => CollisionSet c a b | c -> a , c -> b where
   collisionTypeFrom :: c -> a
   collisionFrom :: c -> b
 
 ---------------------------------------------------------------------------------------------------
--- 個々の当たり判定インスタンスの作成
+-- 各Shapeデータ型をCollisionインスタンスにする
 ---------------------------------------------------------------------------------------------------
 -- 点と点の当たり判定
 
---型定義
-data Point = Point (Int, Int) deriving (Show, Read, Eq)
-
---インスタンス作成 
 instance Collision Point where collision l r = l == r 
  
 ---------------------------------------------------------------------------------------------------
 -- 線と線の当たり判定
  
---型定義
-data Line = Line (Point, Point) deriving (Show, Read, Eq)
-
--- インスタンス作成
 instance Collision Line where
   collision line1 line2 = let
     --パターンマッチで座標取り出し
@@ -73,10 +67,6 @@ instance Collision Line where
 ---------------------------------------------------------------------------------------------------
 -- 四角形と四角形の当たり判定
  
---型定義
-data Rectangle = Rectangle Point Point deriving (Show, Read, Eq)
-
---インスタンス作成
 instance Collision Rectangle where
   collision rect1 rect2 = let
     (Rectangle point0 point1) = rect1
@@ -90,10 +80,6 @@ instance Collision Rectangle where
 ---------------------------------------------------------------------------------------------------
 -- 円と円の当たり判定
  
---型定義
-data Circle = Circle Point Int deriving (Show, Read, Eq)
-
---インスタンス作成
 instance Collision Circle where
   collision cir1 cir2 = let
     (Circle point0 radius0) = cir1
@@ -106,13 +92,12 @@ instance Collision Circle where
 -- 当たり判定枠統合
 ---------------------------------------------------------------------------------------------------
 
--- Shape型 各々の形状を統合した型
-data Shape = ShapePoint Point | ShapeRectangle Rectangle deriving (Show, Read, Eq)
-
 instance Collision Shape where
   --同型同士の当たり判定
   (ShapePoint l) `collision` (ShapePoint r) = l `collision` r
+  (ShapeLine l) `collision` (ShapeLine r) = l `collision` r
   (ShapeRectangle l) `collision` (ShapeRectangle r) = l `collision` r
+  (ShapeCircle l) `collision` (ShapeCircle r) = l `collision` r
 
 ---------------------------------------------------------------------------------------------------
 -- 基本的な型を標準で提供
@@ -121,7 +106,7 @@ instance Collision Shape where
 
 --壁、地面、キャラクター、カーソルの三種類を提供
 data StandardCollisionType = 
-  TypeWall | TypeGround | TypeChar | TypeCursor deriving (Show, Read, Eq)
+  TypeWall | TypeGround | TypeChar | TypeImage deriving (Show, Read, Eq)
 
 --キャラクターと壁／キャラクターとキャラクターは重なれない
 instance CollisionType StandardCollisionType where
