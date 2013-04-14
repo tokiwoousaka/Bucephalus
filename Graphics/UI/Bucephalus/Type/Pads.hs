@@ -5,7 +5,7 @@ module Graphics.UI.Bucephalus.Type.Pads(
   padToVector
   ) where
 
-import Graphics.UI.SDL
+import Graphics.UI.Bucephalus.Type.Events
 
 ---------------------------------------------------------------------------------------------------
 -- ゲームパッド型クラス Bucephalus内部で受け渡しされるゲームパッドやキーボードの状況
@@ -13,7 +13,7 @@ import Graphics.UI.SDL
 
 class GamePad p where
   padInit :: p
-  interpretPadEvent :: p -> Event -> p
+  interpretPadEvent :: p -> BucephalusEvent -> p
 
 ---------------------------------------------------------------------------------------------------
 -- 基本的なゲームボタン型をデフォルトで提供
@@ -61,46 +61,46 @@ incrementPushTime pad = pad {
 
 ---------------------------------------------------------------------------------------------------
 --押されたキーに応じてパッドの状態を変更して返す
-standerdPadEvent :: StandardPad -> Event -> StandardPad
-standerdPadEvent pad (KeyDown (Keysym key _ _)) = keyDownEvent pad key
-standerdPadEvent pad (KeyUp (Keysym key _ _))   = keyUpEvent pad key
+standerdPadEvent :: StandardPad -> BucephalusEvent -> StandardPad
+standerdPadEvent pad (BucephalusKeyDown key) = keyDownEvent pad key
+standerdPadEvent pad (BucephalusKeyUp   key) = keyUpEvent pad key
 standerdPadEvent pad _                          = pad
 
 ---------------------------------------------------------------------------------------------------
 -- キーが押された場合の処理
 
-keyDownEvent :: StandardPad -> SDLKey -> StandardPad
-keyDownEvent pad SDLK_DOWN   = pad { buttonDown   = 1 }
-keyDownEvent pad SDLK_UP     = pad { buttonUp     = 1 }
-keyDownEvent pad SDLK_LEFT   = pad { buttonLeft   = 1 }
-keyDownEvent pad SDLK_RIGHT  = pad { buttonRight  = 1 }
-keyDownEvent pad SDLK_z      = pad { buttonA      = 1 }
-keyDownEvent pad SDLK_x      = pad { buttonB      = 1 }
-keyDownEvent pad SDLK_c      = pad { buttonX      = 1 }
-keyDownEvent pad SDLK_v      = pad { buttonY      = 1 }
-keyDownEvent pad SDLK_a      = pad { buttonL      = 1 }
-keyDownEvent pad SDLK_s      = pad { buttonR      = 1 }
-keyDownEvent pad SDLK_RETURN = pad { buttonStart  = 1 }
-keyDownEvent pad SDLK_ESCAPE = pad { buttonSelect = 1 }
-keyDownEvent pad _           = pad
+keyDownEvent :: StandardPad -> BucephalusKey -> StandardPad
+keyDownEvent pad BucephalusKey_Down   = pad { buttonDown   = 1 }
+keyDownEvent pad BucephalusKey_Up     = pad { buttonUp     = 1 }
+keyDownEvent pad BucephalusKey_Left   = pad { buttonLeft   = 1 }
+keyDownEvent pad BucephalusKey_Right  = pad { buttonRight  = 1 }
+keyDownEvent pad BucephalusKey_z      = pad { buttonA      = 1 }
+keyDownEvent pad BucephalusKey_x      = pad { buttonB      = 1 }
+keyDownEvent pad BucephalusKey_c      = pad { buttonX      = 1 }
+keyDownEvent pad BucephalusKey_v      = pad { buttonY      = 1 }
+keyDownEvent pad BucephalusKey_a      = pad { buttonL      = 1 }
+keyDownEvent pad BucephalusKey_s      = pad { buttonR      = 1 }
+keyDownEvent pad BucephalusKey_Return = pad { buttonStart  = 1 }
+keyDownEvent pad BucephalusKey_Esc    = pad { buttonSelect = 1 }
+keyDownEvent pad _                    = pad
 
 ---------------------------------------------------------------------------------------------------
 -- キーが放された場合の処理
 
-keyUpEvent :: StandardPad -> SDLKey -> StandardPad
-keyUpEvent pad SDLK_DOWN   = pad { buttonDown   = 0 }
-keyUpEvent pad SDLK_UP     = pad { buttonUp     = 0 }
-keyUpEvent pad SDLK_LEFT   = pad { buttonLeft   = 0 }
-keyUpEvent pad SDLK_RIGHT  = pad { buttonRight  = 0 }
-keyUpEvent pad SDLK_z      = pad { buttonA      = 0 }
-keyUpEvent pad SDLK_x      = pad { buttonB      = 0 }
-keyUpEvent pad SDLK_c      = pad { buttonX      = 0 }
-keyUpEvent pad SDLK_v      = pad { buttonY      = 0 }
-keyUpEvent pad SDLK_a      = pad { buttonL      = 0 }
-keyUpEvent pad SDLK_s      = pad { buttonR      = 0 }
-keyUpEvent pad SDLK_RETURN = pad { buttonStart  = 0 }
-keyUpEvent pad SDLK_ESCAPE = pad { buttonSelect = 0 }
-keyUpEvent pad _           = pad
+keyUpEvent :: StandardPad -> BucephalusKey -> StandardPad
+keyUpEvent pad BucephalusKey_Down   = pad { buttonDown   = 0 }
+keyUpEvent pad BucephalusKey_Up     = pad { buttonUp     = 0 }
+keyUpEvent pad BucephalusKey_Left   = pad { buttonLeft   = 0 }
+keyUpEvent pad BucephalusKey_Right  = pad { buttonRight  = 0 }
+keyUpEvent pad BucephalusKey_z      = pad { buttonA      = 0 }
+keyUpEvent pad BucephalusKey_x      = pad { buttonB      = 0 }
+keyUpEvent pad BucephalusKey_c      = pad { buttonX      = 0 }
+keyUpEvent pad BucephalusKey_v      = pad { buttonY      = 0 }
+keyUpEvent pad BucephalusKey_a      = pad { buttonL      = 0 }
+keyUpEvent pad BucephalusKey_s      = pad { buttonR      = 0 }
+keyUpEvent pad BucephalusKey_Return = pad { buttonStart  = 0 }
+keyUpEvent pad BucephalusKey_Esc    = pad { buttonSelect = 0 }
+keyUpEvent pad _                    = pad
 
 ---------------------------------------------------------------------------------------------------
 -- StandardPad ユーティリティ
