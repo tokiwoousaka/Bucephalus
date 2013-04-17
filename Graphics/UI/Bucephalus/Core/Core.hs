@@ -8,7 +8,7 @@ module Graphics.UI.Bucephalus.Core.Core(
   coreStart,
   --Config
   CoreConf(..),
-  defaultCoreConf
+  CoreAPI(..)
   ) where
 
 --Bucephalusモジュール
@@ -24,17 +24,17 @@ import Data.Word (Word32)
 ---------------------------------------------------------------------------------------------------
 
 -- ゲームの状態定義
-class GamePad p => GameState s p | s -> p where
-  gameMainCore :: (p, s) -> IO s
-  gameQuitCore :: s -> IO ()
+class (CoreAPI a b, GamePad p) => GameState a b s p | s -> p where
+  gameMainCore :: a -> (p, s) -> IO s
+  gameQuitCore :: a -> s -> IO ()
 
-  gameQuitCore _ = return ()
+  gameQuitCore _ _ = return ()
 
 ---------------------------------------------------------------------------------------------------
 -- コア
 ---------------------------------------------------------------------------------------------------
 
-coreStart :: (CoreAPI a, GamePad p, GameState s p) => CoreConf a -> p -> s -> IO ()
+coreStart :: (CoreAPI a b, GamePad p, GameState a b s p) => CoreConf a -> p -> s -> IO ()
 coreStart conf defaultPad defaultState = do
   --初期化処理
   bucephalusInit conf
@@ -43,10 +43,10 @@ coreStart conf defaultPad defaultState = do
   (_, final) <- bucephalusGetTicks api >>= mainLoop api (defaultPad, defaultState)
 
   --終了
-  gameQuitCore final
+  gameQuitCore api final
   bucephalusQuit conf
 
-mainLoop :: (CoreAPI a, GamePad p, GameState s p) => a -> (p, s) -> Word32 -> IO (p, s)
+mainLoop :: (CoreAPI a b, GamePad p, GameState a b s p) => a -> (p, s) -> Word32 -> IO (p, s)
 mainLoop api (pad, st) ago = do
   bucephalusDelay api 1 --CPU負担軽減
   --フレーム間隔を一定に保つ
@@ -56,7 +56,7 @@ mainLoop api (pad, st) ago = do
     --ゲーム処理実行
     ev <- bucephalusPollEvent api
     nPad <- return $ interpretPadEvent pad ev
-    nState <- gameMainCore (nPad, st)
+    nState <- gameMainCore api (nPad, st)
     --終了条件判定、再帰
     if isQuit ev then return (nPad, nState) else mainLoop api (nPad, nState) t
 

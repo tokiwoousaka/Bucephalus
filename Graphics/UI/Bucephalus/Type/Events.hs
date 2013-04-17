@@ -4,6 +4,7 @@ data BucephalusEvent
   = BucephalusKeyDown BucephalusKey
   | BucephalusKeyUp  BucephalusKey
   | BucephalusQuit 
+  | BucephalusNoEvent
   deriving (Show, Read, Eq)
 
 data BucephalusKey

@@ -49,10 +49,10 @@ instance CoreAPI BuceAPI BuceFrame where
   --bucephalusLoadImg :: CoreFrame b => a -> String -> IO b
   bucephalusLoadImg _ fn = SDLi.load fn >>= return . BuceFrame
 
-  --bucephalusBulitImg a
-  --  -> b -> Maybe (Int, Int, Int, Int) 
+  --bucephalusBulitImg 
+  --  :: b -> Maybe (Int, Int, Int, Int) 
   --  -> b -> Maybe (Int, Int, Int, Int) -> b -> IO ()
-  bucephalusBulitImg _ from fromRect to toRect = do
+  bucephalusBulitImg from fromRect to toRect = do
       SDL.blitSurface 
         (getBuceFrame from) (fmap tupleToRect fromRect) 
         (getBuceFrame to)   (fmap tupleToRect toRect)
@@ -61,8 +61,8 @@ instance CoreAPI BuceAPI BuceFrame where
   --bucephalusFreeImg :: a -> b -> IO ()
   bucephalusFreeImg _ x = SDL.freeSurface $ getBuceFrame x 
 
-  --bucephalusRotoZoom :: a -> b -> Double -> Double -> Bool -> IO b
-  bucephalusRotoZoom _ x roto size smoot = 
+  --bucephalusRotoZoom :: b -> Double -> Double -> Bool -> IO b
+  bucephalusRotoZoom x roto size smoot = 
     fmap BuceFrame $ SDLr.rotozoom (getBuceFrame x) roto size smoot 
 
   --bucephalusGetWidth :: b -> Int 

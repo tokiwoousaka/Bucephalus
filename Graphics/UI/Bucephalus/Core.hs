@@ -16,7 +16,7 @@ module Graphics.UI.Bucephalus.Core(
   padToVector,
   --Config
   CoreConf(..),
-  defaultCoreConf
+  CoreAPI(..)
   ) where
 
 import Graphics.UI.Bucephalus.Core.Core
