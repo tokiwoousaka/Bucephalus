@@ -19,13 +19,13 @@ newtype BuceFrame = BuceFrame { getBuceFrame :: SDL.Surface } deriving (Show, Eq
 
 type BucephalusCoreConf = CoreConf BuceAPI
 defaultCoreConf :: BucephalusCoreConf
-defaultCoreConf = unitCoreConf { coreAPI = BuceAPI }
+defaultCoreConf = unitCoreConf { coreInterface = BuceAPI }
 
 -----------------------------------------------------------------------------------------------------
 
 data BuceAPI = BuceAPI
 
-instance CoreAPI BuceAPI BuceFrame where
+instance CoreInterface BuceAPI BuceFrame where
   --bucephalusInit :: CoreConf a -> IO ()
   bucephalusInit conf = let
     surfaceFlags = if fullScreen conf then [SDL.Fullscreen] else []

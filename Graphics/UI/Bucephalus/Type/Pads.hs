@@ -8,17 +8,22 @@ module Graphics.UI.Bucephalus.Type.Pads(
 import Graphics.UI.Bucephalus.Type.Events
 
 ---------------------------------------------------------------------------------------------------
--- ゲームパッド型クラス Bucephalus内部で受け渡しされるゲームパッドやキーボードの状況
+-- Definition of type class
 ---------------------------------------------------------------------------------------------------
 
+-- | This type class provide simply game pad operation.
 class GamePad p where
+  -- | This function would return initial game pad.
   padInit :: p
+
+  -- | @inverpretPadEvent@ function provide make status of game pad.
   interpretPadEvent :: p -> BucephalusEvent -> p
 
 ---------------------------------------------------------------------------------------------------
--- 基本的なゲームボタン型をデフォルトで提供
+-- Provide data type of standard game pad 
 ---------------------------------------------------------------------------------------------------
 
+-- | @StandardPad@ data type provide game pad type, that has basic buttons.
 data StandardPad = StandardPad {
   buttonUp :: Integer,
   buttonDown :: Integer,
@@ -103,10 +108,11 @@ keyUpEvent pad BucephalusKey_Esc    = pad { buttonSelect = 0 }
 keyUpEvent pad _                    = pad
 
 ---------------------------------------------------------------------------------------------------
--- StandardPad ユーティリティ
+-- Utility for StandardPad
 ---------------------------------------------------------------------------------------------------
 
---押されてる矢印ボタンの状態からベクタ取得
+-- | This function is utility for @StandardPad@.
+--   e.g. : When pushing buttons @UP@ and @RIGHT@, this function would return (-1, 1).
 padToVector :: StandardPad -> (Int, Int)
 padToVector pad = (leftright pad, updown pad)
      

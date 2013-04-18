@@ -2,51 +2,53 @@
 {-# OPTIONS_GHC -fno-warn-overlapping-patterns #-}
 
 module Graphics.UI.Bucephalus.Core.Core(
-  --型の提供
   GameState(..),
-  --主処理
   coreStart,
-  --Config
   CoreConf(..),
-  CoreAPI(..)
+  CoreInterface(..)
   ) where
 
---Bucephalusモジュール
+-- Bucephalus modules
 import Graphics.UI.Bucephalus.Core.CoreConf
 import Graphics.UI.Bucephalus.Type.Events
 import Graphics.UI.Bucephalus.Type.Pads
 
---Haskell標準
+-- from base
 import Data.Word (Word32)
 
 ---------------------------------------------------------------------------------------------------
--- 型定義
+-- Definition of type class
 ---------------------------------------------------------------------------------------------------
 
--- ゲームの状態定義
-class (CoreAPI a b, GamePad p) => GameState a b s p | s -> p where
+-- | This is type class for holding game status. 
+class (CoreInterface a b, GamePad p) => GameState a b s p | s -> p where
+
+  -- | This function is main programm of your game.
   gameMainCore :: a -> (p, s) -> IO s
+  -- | At the time of an end, bucephalus core program would call this function.
   gameQuitCore :: a -> s -> IO ()
 
   gameQuitCore _ _ = return ()
 
 ---------------------------------------------------------------------------------------------------
--- コア
+-- Main functions
 ---------------------------------------------------------------------------------------------------
 
-coreStart :: (CoreAPI a b, GamePad p, GameState a b s p) => CoreConf a -> p -> s -> IO ()
+-- | @coreStart@ function provide basic operations. 
+--   e.g. : main loop operation ,end judging and so on.
+coreStart :: (CoreInterface a b, GamePad p, GameState a b s p) => CoreConf a -> p -> s -> IO ()
 coreStart conf defaultPad defaultState = do
   --初期化処理
   bucephalusInit conf
   --メインループ
-  api <- return $ coreAPI conf
+  api <- return $ coreInterface conf
   (_, final) <- bucephalusGetTicks api >>= mainLoop api (defaultPad, defaultState)
 
   --終了
   gameQuitCore api final
   bucephalusQuit conf
 
-mainLoop :: (CoreAPI a b, GamePad p, GameState a b s p) => a -> (p, s) -> Word32 -> IO (p, s)
+mainLoop :: (CoreInterface a b, GamePad p, GameState a b s p) => a -> (p, s) -> Word32 -> IO (p, s)
 mainLoop api (pad, st) ago = do
   bucephalusDelay api 1 --CPU負担軽減
   --フレーム間隔を一定に保つ

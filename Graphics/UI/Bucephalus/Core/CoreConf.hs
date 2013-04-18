@@ -5,26 +5,28 @@ import Graphics.UI.Bucephalus.Type.Events
 import Data.Word (Word32)
 
 ---------------------------------------------------------------------------------------------------
--- 型定義
+-- Definition of data type
 ---------------------------------------------------------------------------------------------------
 
+-- | This is configuration data for bucephalus @Core@ program.
 data CoreConf a = CoreConf {
   fullScreen :: Bool,
-  coreAPI :: a
+  coreInterface :: a
   }
 
 ---------------------------------------------------------------------------------------------------
 
+-- | Default configration holding unit.
 unitCoreConf :: CoreConf ()
 unitCoreConf = CoreConf {
   fullScreen = False,
-  coreAPI = ()
+  coreInterface = ()
   }
 
 ---------------------------------------------------------------------------------------------------
--- マルチメディアライブラリを呼び出すためのAPI
 
-class CoreAPI a b | a -> b where
+-- | This type class provide interface to multi media libraly.
+class CoreInterface a b | a -> b where
   bucephalusInit :: CoreConf a -> IO ()
   bucephalusQuit :: CoreConf a -> IO ()
   bucephalusGetTicks :: a -> IO Word32

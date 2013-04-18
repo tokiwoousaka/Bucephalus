@@ -8,12 +8,17 @@ import Graphics.UI.Bucephalus.SDLApi
 --Bucephalus Core テストプログラム
 
 main :: IO ()
-main = testProgram 0 --引数切り替えて実行するテストを変える
+main = do
+  putStrLn "Select test program"
+  putStrLn "AnimationTest - 0"
+
+  getLine >>= testProgram . read 
 
 testProgram :: Int -> IO ()
 testProgram 0 = animationMain
 --testProgram 1 = padTestMain
 --testProgram 2 = soundTestMain
+testProgram _ = return ()
 
 ---------------------------------------------------------------------------------------------------
 -- 型定義
@@ -87,7 +92,7 @@ getSurfaceSize api sur = (bucephalusGetWidth api sur, bucephalusGetHeight api su
 -- アニメーションテスト
 ---------------------------------------------------------------------------------------------------
 
---coreStart :: (CoreAPI a b, GamePad p, GameState s p) => CoreConf a -> p -> s -> IO ()
+--coreStart :: (CoreInterface a b, GamePad p, GameState s p) => CoreConf a -> p -> s -> IO ()
 animationMain = initAnimation BuceAPI >>= coreStart defaultCoreConf (padInit :: StandardPad)
 
 --初期化
@@ -116,7 +121,7 @@ initAnimation api = do
 data AnimationState = AnimationState ([OnpuState], Integer)
 instance GameState BuceAPI BuceFrame AnimationState StandardPad where
   --主処理
-  --gameMainCore :: CoreAPI a b => a -> (p, s) -> IO s
+  --gameMainCore :: CoreInterface a b => a -> (p, s) -> IO s
   gameMainCore api (_, AnimationState (onpu, cnt)) = do
     --データ取得
     screen <- bucephalusGetVideoFrame api

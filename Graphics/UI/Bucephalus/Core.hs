@@ -6,7 +6,6 @@
 ---------------------------------------------------------------------------------------------------
 
 module Graphics.UI.Bucephalus.Core(
-  --型の提供
   GameState(..),
   --主処理
   coreStart,
@@ -16,7 +15,7 @@ module Graphics.UI.Bucephalus.Core(
   padToVector,
   --Config
   CoreConf(..),
-  CoreAPI(..)
+  CoreInterface(..)
   ) where
 
 import Graphics.UI.Bucephalus.Core.Core
