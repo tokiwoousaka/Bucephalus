@@ -1,6 +1,6 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 
-module Graphics.UI.Bucephalus.SDLApi (
+module Graphics.UI.Bucephalus.Interfaces.SDLInterface (
   BucePicture(..),
   BuceInterface(..),
   defaultCoreConf

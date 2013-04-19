@@ -2,7 +2,7 @@
 
 module Core where
 import Graphics.UI.Bucephalus.Core
-import Graphics.UI.Bucephalus.SDLApi
+import Graphics.UI.Bucephalus.Interfaces.SDLInterface
 
 ---------------------------------------------------------------------------------------------------
 --Bucephalus Core テストプログラム
