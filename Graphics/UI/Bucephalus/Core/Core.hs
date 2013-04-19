@@ -23,7 +23,7 @@ import Data.Word (Word32)
 -- | This is type class for holding game status. 
 class (CoreInterface a b, GamePad p) => GameState a b s p | s -> p where
 
-  -- | This function is main programm of your game.
+  -- | This function is main program of your game.
   gameMainCore :: a -> (p, s) -> IO s
   -- | At the time of an end, bucephalus core program would call this function.
   gameQuitCore :: a -> s -> IO ()
@@ -43,7 +43,6 @@ coreStart conf defaultPad defaultState = do
   --メインループ
   api <- return $ coreInterface conf
   (_, final) <- bucephalusGetTicks api >>= mainLoop api (defaultPad, defaultState)
-
   --終了
   gameQuitCore api final
   bucephalusQuit conf

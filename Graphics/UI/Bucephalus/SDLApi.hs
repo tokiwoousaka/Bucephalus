@@ -1,8 +1,8 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 
 module Graphics.UI.Bucephalus.SDLApi (
-  BuceFrame(..),
-  BuceAPI(..),
+  BucePicture(..),
+  BuceInterface(..),
   defaultCoreConf
   ) where
 import Graphics.UI.Bucephalus.Core.CoreConf
@@ -12,21 +12,22 @@ import qualified Graphics.UI.SDL.Image as SDLi
 import qualified Graphics.UI.SDL.Rotozoomer as SDLr
 
 -----------------------------------------------------------------------------------------------------
--- 型定義
+-- Definition of type
 -----------------------------------------------------------------------------------------------------
 
-newtype BuceFrame = BuceFrame { getBuceFrame :: SDL.Surface } deriving (Show, Eq)
+-- | This type holding SDL surface.
+newtype BucePicture = BucePicture { getBucePicture :: SDL.Surface } deriving (Show, Eq)
 
-type BucephalusCoreConf = CoreConf BuceAPI
+-- | @defaultCoreConf@ is default core configuration with SDL interface.
 defaultCoreConf :: BucephalusCoreConf
-defaultCoreConf = unitCoreConf { coreInterface = BuceAPI }
+defaultCoreConf = unitCoreConf { coreInterface = BuceInterface }
 
 -----------------------------------------------------------------------------------------------------
 
-data BuceAPI = BuceAPI
+-- @BucephalusInterface@ data type provide interface from SDL multi media library.
+data BuceInterface = BuceInterface
 
-instance CoreInterface BuceAPI BuceFrame where
-  --bucephalusInit :: CoreConf a -> IO ()
+instance CoreInterface BuceInterface BucePicture where
   bucephalusInit conf = let
     surfaceFlags = if fullScreen conf then [SDL.Fullscreen] else []
     in do
@@ -34,62 +35,48 @@ instance CoreInterface BuceAPI BuceFrame where
       SDL.setVideoMode 640 480 32 surfaceFlags
       return ()
 
-  --bucephalusQuit :: CoreConf a -> IO ()
   bucephalusQuit _ = SDL.quit
 
-  --bucephalusGetTicks :: a -> IO Word32
   bucephalusGetTicks _ = SDL.getTicks
 
-  --bucephalusPollEvent :: a -> bucephalusEvent
   bucephalusPollEvent _ = SDL.pollEvent >>= return . convertEvent
 
-  --bucephalusDelay :: a -> Word32 -> IO ()
   bucephalusDelay _ = SDL.delay 
 
-  --bucephalusLoadImg :: CoreFrame b => a -> String -> IO b
-  bucephalusLoadImg _ fn = SDLi.load fn >>= return . BuceFrame
+  bucephalusLoadImg _ fn = SDLi.load fn >>= return . BucePicture
 
-  --bucephalusBulitImg a
-  --  -> b -> Maybe (Int, Int, Int, Int) 
-  --  -> b -> Maybe (Int, Int, Int, Int) -> b -> IO ()
   bucephalusBulitImg _ from fromRect to toRect = do
       SDL.blitSurface 
-        (getBuceFrame from) (fmap tupleToRect fromRect) 
-        (getBuceFrame to)   (fmap tupleToRect toRect)
+        (getBucePicture from) (fmap tupleToRect fromRect) 
+        (getBucePicture to)   (fmap tupleToRect toRect)
       return ()
 
-  --bucephalusFreeImg :: a -> b -> IO ()
-  bucephalusFreeImg _ x = SDL.freeSurface $ getBuceFrame x 
+  bucephalusFreeImg _ x = SDL.freeSurface $ getBucePicture x 
 
-  --bucephalusRotoZoom :: a -> b -> Double -> Double -> Bool -> IO b
   bucephalusRotoZoom _ x roto size smoot = 
-    fmap BuceFrame $ SDLr.rotozoom (getBuceFrame x) roto size smoot 
+    fmap BucePicture $ SDLr.rotozoom (getBucePicture x) roto size smoot 
 
-  --bucephalusGetWidth :: b -> Int 
-  bucephalusGetWidth _ = SDL.surfaceGetWidth . getBuceFrame
+  bucephalusGetWidth _ = SDL.surfaceGetWidth . getBucePicture
 
-  --bucephalusGetHeight :: b -> Int
-  bucephalusGetHeight _ = SDL.surfaceGetHeight . getBuceFrame
+  bucephalusGetHeight _ = SDL.surfaceGetHeight . getBucePicture
 
-  --bucephalusGetVideoFrame :: IO b
-  bucephalusGetVideoFrame _ = fmap BuceFrame SDL.getVideoSurface
+  bucephalusGetVideoFrame _ = fmap BucePicture SDL.getVideoSurface
 
-  --bucephalusFlip :: a -> b -> IO ()
-  bucephalusFlip _ = SDL.flip . getBuceFrame
+  bucephalusFlip _ = SDL.flip . getBucePicture
 
-  --bucephalusFreeFrame :: a -> b -> IO ()
-  bucephalusFreeFrame _ = SDL.freeSurface . getBuceFrame
+  bucephalusFreeFrame _ = SDL.freeSurface . getBucePicture
 
-  --bucephalusFillRect :: a -> b ->  Maybe (Int, Int, Int, Int) -> Word32 -> IO ()
   bucephalusFillRect _ b rect color 
-    = SDL.fillRect (getBuceFrame b) (fmap tupleToRect rect) (SDL.Pixel color) >> return ()
+    = SDL.fillRect (getBucePicture b) (fmap tupleToRect rect) (SDL.Pixel color) >> return ()
 
 -----------------------------------------------------------------------------------------------------
+-- Helper functions
+-----------------------------------------------------------------------------------------------------
 
---convert tuple to rect
+-- This function provide convert tuple to rect
 tupleToRect (x, y, w, h) = SDL.Rect x y w h
 
---convert sdl event to bucephalus event
+-- This function provide convert sdl event to bucephalus event
 convertEvent :: SDL.Event -> BucephalusEvent
 convertEvent SDL.Quit = BucephalusQuit
 convertEvent _        = BucephalusNoEvent
