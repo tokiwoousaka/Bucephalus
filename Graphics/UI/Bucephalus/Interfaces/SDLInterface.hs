@@ -1,15 +1,18 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 
 module Graphics.UI.Bucephalus.Interfaces.SDLInterface (
-  BucePicture(..),
   BuceInterface(..),
-  defaultCoreConf
+  defaultCoreConf,
+  BucePicture(..),
+  BuceSound(..),
+  BuceMusic(..)
   ) where
 import Graphics.UI.Bucephalus.Core.CoreConf
 import Graphics.UI.Bucephalus.Type.Events
-import qualified Graphics.UI.SDL as SDL
-import qualified Graphics.UI.SDL.Image as SDLi
+import qualified Graphics.UI.SDL            as SDL
+import qualified Graphics.UI.SDL.Image      as SDLi
 import qualified Graphics.UI.SDL.Rotozoomer as SDLr
+import qualified Graphics.UI.SDL.Mixer      as SDLm
 
 -----------------------------------------------------------------------------------------------------
 -- Definition of type
@@ -17,6 +20,10 @@ import qualified Graphics.UI.SDL.Rotozoomer as SDLr
 
 -- | This type holding SDL surface.
 newtype BucePicture = BucePicture { getBucePicture :: SDL.Surface } deriving (Show, Eq)
+
+newtype BuceMusic = BuceMusic { getBuceMusic :: SDLm.Music } deriving (Show, Eq)
+
+newtype BuceSound = BuceSound { getBuceSound :: SDLm.Chunk } deriving (Show, Eq)
 
 -- | @defaultCoreConf@ is default core configuration with SDL interface.
 defaultCoreConf :: CoreConf BuceInterface 
@@ -27,12 +34,16 @@ defaultCoreConf = unitCoreConf { coreInterface = BuceInterface }
 -- @BucephalusInterface@ data type provide interface from SDL multi media library.
 data BuceInterface = BuceInterface
 
-instance CoreInterface BuceInterface BucePicture where
+instance CoreInterface BuceInterface BucePicture BuceMusic BuceSound where
   bucephalusInit conf = let
+    --固定値
+    stereo = 2
+    mixDefaultFrequency = 22050
     surfaceFlags = if fullScreen conf then [SDL.Fullscreen] else []
     in do
       SDL.init [SDL.InitEverything]
       SDL.setVideoMode 640 480 32 surfaceFlags
+      SDLm.openAudio mixDefaultFrequency SDLm.AudioS16Sys stereo 1024
       return ()
 
   bucephalusQuit _ = SDL.quit
@@ -51,7 +62,7 @@ instance CoreInterface BuceInterface BucePicture where
         (getBucePicture to)   (fmap tupleToRect toRect)
       return ()
 
-  bucephalusFreeImg _ x = SDL.freeSurface $ getBucePicture x 
+  bucephalusFreePicture _ = SDL.freeSurface . getBucePicture
 
   bucephalusRotoZoom _ x roto size smoot = 
     fmap BucePicture $ SDLr.rotozoom (getBucePicture x) roto size smoot 
@@ -60,14 +71,20 @@ instance CoreInterface BuceInterface BucePicture where
 
   bucephalusGetHeight _ = SDL.surfaceGetHeight . getBucePicture
 
-  bucephalusGetVideoFrame _ = fmap BucePicture SDL.getVideoSurface
+  bucephalusGetScreen _ = fmap BucePicture SDL.getVideoSurface
 
   bucephalusFlip _ = SDL.flip . getBucePicture
 
-  bucephalusFreeFrame _ = SDL.freeSurface . getBucePicture
-
   bucephalusFillRect _ b rect color 
     = SDL.fillRect (getBucePicture b) (fmap tupleToRect rect) (SDL.Pixel color) >> return ()
+
+  bucephalusLoadWav _ fname = fmap BuceSound $ SDLm.loadWAV fname
+
+  bucephalusLoadMusic _ fname = fmap BuceMusic $ SDLm.loadMUS fname
+
+  bucephalusPlayMusic _ d r = SDLm.playMusic (getBuceMusic d) r
+
+  bucephalusPlaySound _ i d c = SDLm.playChannel i (getBuceSound d) c >> return ()
 
 -----------------------------------------------------------------------------------------------------
 -- Helper functions

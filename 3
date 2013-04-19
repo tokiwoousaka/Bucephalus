@@ -13,7 +13,6 @@ main = do
   putStrLn "-------------------"
   putStrLn "Animation Test - 0"
   putStrLn "Gamepad Test   - 1"
-  putStrLn "Sound Test     - 2"
   putStrLn "Quit           - Other"
   putStrLn "-------------------"
 
@@ -22,7 +21,7 @@ main = do
 testProgram :: String -> IO ()
 testProgram "0" = animationMain
 testProgram "1" = padTestMain
-testProgram "2" = soundTestMain
+--testProgram 2 = soundTestMain
 testProgram _ = return ()
 
 ---------------------------------------------------------------------------------------------------
@@ -124,7 +123,7 @@ initAnimation iFace = do
 ---------------------------------------------------------------------------------------------------
 --型定義
 data AnimationState = AnimationState ([OnpuState], Integer)
-instance GameState BuceInterface BucePicture BuceMusic BuceSound AnimationState StandardPad where
+instance GameState BuceInterface BucePicture AnimationState StandardPad BuceMusic BuceSound where
   --主処理
   --gameMainCore :: CoreInterface a b => a -> (p, s) -> IO s
   gameMainCore iFace (_, AnimationState (onpu, cnt)) = do
@@ -157,7 +156,7 @@ initPadTest iFace = do
 -----------------------------------------------------------------------------------------------------
 
 data PadTestState = PadTestState (OnpuState, Integer)
-instance GameState BuceInterface BucePicture BuceMusic BuceSound PadTestState StandardPad where
+instance GameState BuceInterface BucePicture PadTestState StandardPad BuceMusic BuceSound where
   gameMainCore iFace (ps, PadTestState (onpu, cnt)) = do
     --データ取得
     screen <- bucephalusGetScreen iFace
@@ -200,14 +199,14 @@ setOnpuSeList :: SoundTestState -> [OnpuSeState] -> SoundTestState
 setOnpuSeList (SoundTestState (Just (mus, _))) st = SoundTestState (Just (mus, st))
 
 --主処理作成
-instance GameState BuceInterface BucePicture BuceMusic BuceSound SoundTestState StandardPad where
+instance GameState SoundTestState StandardPad BuceInterface BucePicture BuceMusic BuceSound where
   gameMainCore iFace (ps, st) = do
     --初期化
-    inited <- initSoundTestState iFace st
+    inited <- initSoundTestState st
     --描画＆効果音再生
     screen <- bucephalusGetScreen iFace
     bucephalusFillRect iFace screen Nothing 0
-    nxOnpuList <- mapM (playSound iFace screen ps) (getOnpuSeList inited)
+    nxOnpuList <- mapM (playSound screen ps) (getOnpuSeList inited)
     bucephalusFlip iFace screen
     --フレーム処理終了
     return $ setOnpuSeList inited nxOnpuList
@@ -219,7 +218,7 @@ initSoundTestState iFace (SoundTestState Nothing) = let
   --補助
   initSeOnpu (x, y) getBtnf channel fName sName = do
     chunk <- bucephalusLoadWav iFace sName
-    onpu <- initOnpuState iFace (0, 0) (x, y) fName 
+    onpu <- initOnpuState (0, 0) (x, y) fName 
     return (onpu, 0, channel, getBtnf, chunk)
   in do
     --サウンド／画像読み込み
@@ -231,7 +230,7 @@ initSoundTestState iFace (SoundTestState Nothing) = let
       initSeOnpu (420, 290) buttonDown  4 "Test/resources/OnpuG.png" "Test/resources/se3.wav",
       initSeOnpu (520, 190) buttonRight 5 "Test/resources/OnpuB.png" "Test/resources/se4.wav"]
     --BGM再生
-    mus <- bucephalusLoadMusic iFace "Test/resources/BLIZZARD.ogg"
+    mus <- bucephalusLoadMusic "Test/resources/BLIZZARD.ogg"
     bucephalusPlayMusic iFace mus (-1)
     --返却
     return $ SoundTestState (Just (mus, seOnpuList))

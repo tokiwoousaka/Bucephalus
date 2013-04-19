@@ -21,7 +21,7 @@ import Data.Word (Word32)
 ---------------------------------------------------------------------------------------------------
 
 -- | This is type class for holding game status. 
-class (CoreInterface a b, GamePad p) => GameState a b s p | s -> p where
+class (CoreInterface a b m c, GamePad p) => GameState a b m c s p | s -> p where
 
   -- | This function is main program of your game.
   gameMainCore :: a -> (p, s) -> IO s
@@ -31,12 +31,12 @@ class (CoreInterface a b, GamePad p) => GameState a b s p | s -> p where
   gameQuitCore _ _ = return ()
 
 ---------------------------------------------------------------------------------------------------
--- Main functions
+-- Core program
 ---------------------------------------------------------------------------------------------------
 
 -- | @coreStart@ function provide basic operations. 
 --   e.g. : main loop operation ,end judging and so on.
-coreStart :: (CoreInterface a b, GamePad p, GameState a b s p) => CoreConf a -> p -> s -> IO ()
+coreStart :: (CoreInterface a b m c, GamePad p, GameState a b m c s p) => CoreConf a -> p -> s -> IO ()
 coreStart conf defaultPad defaultState = do
   --初期化処理
   bucephalusInit conf
@@ -47,7 +47,7 @@ coreStart conf defaultPad defaultState = do
   gameQuitCore api final
   bucephalusQuit conf
 
-mainLoop :: (CoreInterface a b, GamePad p, GameState a b s p) => a -> (p, s) -> Word32 -> IO (p, s)
+mainLoop :: (CoreInterface a b c d, GamePad p, GameState a b c d s p) => a -> (p, s) -> Word32 -> IO (p, s)
 mainLoop api (pad, st) ago = do
   bucephalusDelay api 1 --CPU負担軽減
   --フレーム間隔を一定に保つ

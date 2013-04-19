@@ -26,7 +26,7 @@ unitCoreConf = CoreConf {
 ---------------------------------------------------------------------------------------------------
 
 -- | This type class provide interface to multi media libraly.
-class CoreInterface a b | a -> b where
+class CoreInterface a b m c | a -> b, a -> m, a -> c where
   bucephalusInit :: CoreConf a -> IO ()
   bucephalusQuit :: CoreConf a -> IO ()
   bucephalusGetTicks :: a -> IO Word32
@@ -36,11 +36,14 @@ class CoreInterface a b | a -> b where
   bucephalusBulitImg :: a
     -> b -> Maybe (Int, Int, Int, Int) 
     -> b -> Maybe (Int, Int, Int, Int) -> IO ()
-  bucephalusFreeImg :: a -> b -> IO ()
+  bucephalusFreePicture :: a -> b -> IO ()
   bucephalusRotoZoom :: a -> b -> Double -> Double -> Bool -> IO b
   bucephalusGetWidth :: a -> b -> Int
   bucephalusGetHeight :: a -> b -> Int
-  bucephalusGetVideoFrame :: a -> IO b
+  bucephalusGetScreen :: a -> IO b
   bucephalusFlip :: a -> b -> IO ()
-  bucephalusFreeFrame :: a -> b -> IO ()
   bucephalusFillRect :: a -> b ->  Maybe (Int, Int, Int, Int) -> Word32 -> IO ()
+  bucephalusLoadMusic :: a -> String -> IO m
+  bucephalusLoadWav :: a -> String -> IO c
+  bucephalusPlayMusic :: a -> m -> Int -> IO ()
+  bucephalusPlaySound :: a -> Int -> c -> Int -> IO ()
