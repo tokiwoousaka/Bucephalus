@@ -19,7 +19,7 @@ import qualified Graphics.UI.SDL.Rotozoomer as SDLr
 newtype BucePicture = BucePicture { getBucePicture :: SDL.Surface } deriving (Show, Eq)
 
 -- | @defaultCoreConf@ is default core configuration with SDL interface.
-defaultCoreConf :: BucephalusCoreConf
+defaultCoreConf :: CoreConf BuceInterface 
 defaultCoreConf = unitCoreConf { coreInterface = BuceInterface }
 
 -----------------------------------------------------------------------------------------------------
@@ -73,10 +73,45 @@ instance CoreInterface BuceInterface BucePicture where
 -- Helper functions
 -----------------------------------------------------------------------------------------------------
 
--- This function provide convert tuple to rect
 tupleToRect (x, y, w, h) = SDL.Rect x y w h
 
--- This function provide convert sdl event to bucephalus event
 convertEvent :: SDL.Event -> BucephalusEvent
-convertEvent SDL.Quit = BucephalusQuit
-convertEvent _        = BucephalusNoEvent
+convertEvent (SDL.KeyDown (SDL.Keysym key _ _)) = BucephalusKeyDown $ convertKeyType key
+convertEvent (SDL.KeyUp   (SDL.Keysym key _ _)) = BucephalusKeyUp   $ convertKeyType key
+convertEvent SDL.Quit                           = BucephalusQuit
+convertEvent _                                  = BucephalusNoEvent
+
+convertKeyType :: SDL.SDLKey -> BucephalusKey
+convertKeyType SDL.SDLK_ESCAPE = BucephalusKey_Esc 
+convertKeyType SDL.SDLK_UP     = BucephalusKey_Up
+convertKeyType SDL.SDLK_DOWN   = BucephalusKey_Down
+convertKeyType SDL.SDLK_LEFT   = BucephalusKey_Left
+convertKeyType SDL.SDLK_RIGHT  = BucephalusKey_Right
+convertKeyType SDL.SDLK_a      = BucephalusKey_a
+convertKeyType SDL.SDLK_b      = BucephalusKey_b
+convertKeyType SDL.SDLK_c      = BucephalusKey_c
+convertKeyType SDL.SDLK_d      = BucephalusKey_d
+convertKeyType SDL.SDLK_e      = BucephalusKey_e
+convertKeyType SDL.SDLK_f      = BucephalusKey_f
+convertKeyType SDL.SDLK_g      = BucephalusKey_g
+convertKeyType SDL.SDLK_h      = BucephalusKey_h
+convertKeyType SDL.SDLK_i      = BucephalusKey_i
+convertKeyType SDL.SDLK_j      = BucephalusKey_j
+convertKeyType SDL.SDLK_k      = BucephalusKey_k
+convertKeyType SDL.SDLK_l      = BucephalusKey_l
+convertKeyType SDL.SDLK_m      = BucephalusKey_m
+convertKeyType SDL.SDLK_n      = BucephalusKey_n
+convertKeyType SDL.SDLK_o      = BucephalusKey_o
+convertKeyType SDL.SDLK_p      = BucephalusKey_p
+convertKeyType SDL.SDLK_q      = BucephalusKey_q
+convertKeyType SDL.SDLK_r      = BucephalusKey_r
+convertKeyType SDL.SDLK_s      = BucephalusKey_s
+convertKeyType SDL.SDLK_t      = BucephalusKey_t
+convertKeyType SDL.SDLK_u      = BucephalusKey_u
+convertKeyType SDL.SDLK_v      = BucephalusKey_v
+convertKeyType SDL.SDLK_w      = BucephalusKey_w
+convertKeyType SDL.SDLK_x      = BucephalusKey_x
+convertKeyType SDL.SDLK_y      = BucephalusKey_y
+convertKeyType SDL.SDLK_z      = BucephalusKey_z
+convertKeyType SDL.SDLK_RETURN = BucephalusKey_Return
+convertKeyType _               = BucephalusKey_Unknown

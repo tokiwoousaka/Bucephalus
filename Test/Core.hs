@@ -10,7 +10,10 @@ import Graphics.UI.Bucephalus.SDLApi
 main :: IO ()
 main = do
   putStrLn "Select test program"
+  putStrLn "-------------------"
   putStrLn "AnimationTest - 0"
+  putStrLn "Quit          - Other"
+  putStrLn "-------------------"
 
   getLine >>= testProgram . read 
 
@@ -25,12 +28,12 @@ testProgram _ = return ()
 ---------------------------------------------------------------------------------------------------
 
 data OnpuState = OnpuState {
-  onpuSurface  :: BuceFrame, 
+  onpuSurface  :: BucePicture, 
   onpuVector :: (Int, Int), 
   onpuPosition :: (Int, Int)} deriving (Show, Eq)
 
 --おんぷ初期化
-initOnpuState :: BuceAPI -> (Int, Int) -> (Int, Int) -> String -> IO OnpuState
+initOnpuState :: BuceInterface -> (Int, Int) -> (Int, Int) -> String -> IO OnpuState
 initOnpuState api (mx, my) (x, y) fnm = do
   sfc <- (bucephalusLoadImg api) fnm
   return $ OnpuState sfc (mx, my) (x, y)
@@ -53,7 +56,7 @@ boundOnpu onpu@(OnpuState _ (vx, vy) (px, py))
 
 ---------------------------------------------------------------------------------------------------
 --画像を転送する
-blitOnpu :: BuceAPI -> Double -> BuceFrame -> OnpuState -> IO ()
+blitOnpu :: BuceInterface -> Double -> BucePicture -> OnpuState -> IO ()
 blitOnpu api size screen onpu = do
   --データ取り出し
   img <- return $ onpuSurface onpu
@@ -75,7 +78,7 @@ vibration cy x
   | otherwise = x + 1
 
 --zoom前後のサーフェスから座標補正
-calcZoomRect :: BuceAPI -> BuceFrame -> BuceFrame -> Int -> Int -> (Int, Int, Int, Int) 
+calcZoomRect :: BuceInterface -> BucePicture -> BucePicture -> Int -> Int -> (Int, Int, Int, Int) 
 calcZoomRect api bef aft x y =
   let
     (bw, bh) = getSurfaceSize api bef
@@ -85,7 +88,7 @@ calcZoomRect api bef aft x y =
     in (x', y', aw, ah)
 
 --サーフェスから幅と高さを取得
-getSurfaceSize :: BuceAPI -> BuceFrame -> (Int, Int)
+getSurfaceSize :: BuceInterface -> BucePicture -> (Int, Int)
 getSurfaceSize api sur = (bucephalusGetWidth api sur, bucephalusGetHeight api sur)
 
 ---------------------------------------------------------------------------------------------------
@@ -93,10 +96,10 @@ getSurfaceSize api sur = (bucephalusGetWidth api sur, bucephalusGetHeight api su
 ---------------------------------------------------------------------------------------------------
 
 --coreStart :: (CoreInterface a b, GamePad p, GameState s p) => CoreConf a -> p -> s -> IO ()
-animationMain = initAnimation BuceAPI >>= coreStart defaultCoreConf (padInit :: StandardPad)
+animationMain = initAnimation BuceInterface >>= coreStart defaultCoreConf (padInit :: StandardPad)
 
 --初期化
-initAnimation :: BuceAPI -> IO AnimationState
+initAnimation :: BuceInterface -> IO AnimationState
 initAnimation api = do
   onpu <- sequence $ [
     initOnpuState api (1 , 1 ) (0, 0) "Test/resources/OnpuG.png",
@@ -119,7 +122,7 @@ initAnimation api = do
 ---------------------------------------------------------------------------------------------------
 --型定義
 data AnimationState = AnimationState ([OnpuState], Integer)
-instance GameState BuceAPI BuceFrame AnimationState StandardPad where
+instance GameState BuceInterface BucePicture AnimationState StandardPad where
   --主処理
   --gameMainCore :: CoreInterface a b => a -> (p, s) -> IO s
   gameMainCore api (_, AnimationState (onpu, cnt)) = do

@@ -40,4 +40,5 @@ data BucephalusKey
   | BucephalusKey_y
   | BucephalusKey_z
   | BucephalusKey_Return
+  | BucephalusKey_Unknown
   deriving (Show, Read, Eq)
