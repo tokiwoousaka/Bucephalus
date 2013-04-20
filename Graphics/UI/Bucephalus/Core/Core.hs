@@ -23,9 +23,9 @@ import Data.Word (Word32)
 -- | This is type class for holding game status. 
 class (CoreInterface a b m c, GamePad p) => GameState a b m c s p | s -> p where
 
-  -- | This function is main program of your game.
+  -- | This function represents main program of your game.
   gameMainCore :: a -> (p, s) -> IO s
-  -- | At the time of an end, bucephalus core program would call this function.
+  -- | At the time of an end, bucephalus core program calls this function.
   gameQuitCore :: a -> s -> IO ()
 
   gameQuitCore _ _ = return ()
@@ -34,7 +34,7 @@ class (CoreInterface a b m c, GamePad p) => GameState a b m c s p | s -> p where
 -- Core program
 ---------------------------------------------------------------------------------------------------
 
--- | @coreStart@ function provide basic operations. 
+-- | The @coreStart@ function provides basic operations. 
 --   e.g. : main loop operation ,end judging and so on.
 coreStart :: (CoreInterface a b m c, GamePad p, GameState a b m c s p) => CoreConf a -> p -> s -> IO ()
 coreStart conf defaultPad defaultState = do

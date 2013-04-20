@@ -21,17 +21,19 @@ import qualified Graphics.UI.SDL.Mixer      as SDLm
 -- | This type holding SDL surface.
 newtype BucePicture = BucePicture { getBucePicture :: SDL.Surface } deriving (Show, Eq)
 
+-- | This type holding SDL Music.
 newtype BuceMusic = BuceMusic { getBuceMusic :: SDLm.Music } deriving (Show, Eq)
 
+-- | This type holding SDL Chunk.
 newtype BuceSound = BuceSound { getBuceSound :: SDLm.Chunk } deriving (Show, Eq)
 
--- | @defaultCoreConf@ is default core configuration with SDL interface.
+-- | @defaultCoreConf@ is default core configuration to utilize SDL interface.
 defaultCoreConf :: CoreConf BuceInterface 
 defaultCoreConf = unitCoreConf { coreInterface = BuceInterface }
 
 -----------------------------------------------------------------------------------------------------
 
--- @BucephalusInterface@ data type provide interface from SDL multi media library.
+-- | This Type takes a role to call Bucephalus library from SDL library.
 data BuceInterface = BuceInterface
 
 instance CoreInterface BuceInterface BucePicture BuceMusic BuceSound where

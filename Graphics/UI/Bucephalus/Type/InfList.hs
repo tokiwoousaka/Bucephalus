@@ -32,36 +32,36 @@ instance PRE.Monad List where
 -- Simply functions for InfList
 ---------------------------------------------------------------------------------------------------
 
--- | @fromList@ function provide convert from @[a]@ to @InfList.List a@.
+-- | The @fromList@ function provides convert from @[a]@ to @InfList.List a@.
 fromList :: [a] -> a -> List a
 fromList [] d = List $ PRE.repeat d
 fromList x  d = List $ PRE.cycle x
 
--- | @toList@ function provide convert from @InfList.List@ to @[]@.
+-- | The @toList@ function provides convert from @InfList.List@ to @[]@.
 toList :: List a -> [a]
 toList (List x) = x 
 
--- | @map@ function for @InfList.List@
+-- | The @map@ function for @InfList.List@.
 map :: (a -> b) -> List a -> List b
 map f (List x) = List $ PRE.map f x
 
--- | take function for @InfList.List@
+-- | The @take@ function for @InfList.List@
 take :: PRE.Int -> List a -> [a]
 take i (List x) = PRE.take i x
 
--- | head function for @InfList.List@
+-- | The @head function for @InfList.List@.
 head :: List a -> Maybe a
 head (List []) = Nothing 
 head (List x) = Just $ PRE.head x
 
--- | tail function for @InfList.List@
+-- | The @tail@ function for @InfList.List@.
 tail :: List a -> List a
 tail (List x) = List $ PRE.tail x
 
--- | zip function for @InfList.List@
+-- | The @zip@ function for @InfList.List@.
 zip :: List a -> List b -> List (a, b)
 zip (List x) (List y) = List $ PRE.zip x y
 
--- | zipWith function for @InfList.List@
+-- | The @zipWith@ function for @InfList.List@.
 zipWith :: (a -> b -> c) -> List a -> List b -> List c
 zipWith f (List x) (List y) = List $ PRE.zipWith f x y

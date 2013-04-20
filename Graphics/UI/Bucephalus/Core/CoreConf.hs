@@ -8,7 +8,7 @@ import Data.Word (Word32)
 -- Definition of data type
 ---------------------------------------------------------------------------------------------------
 
--- | This is configuration data for bucephalus @Core@ program.
+-- | This is the configuration data for bucephalus @Core@ program.
 data CoreConf a = CoreConf {
   fullScreen :: Bool,
   coreInterface :: a
@@ -16,7 +16,7 @@ data CoreConf a = CoreConf {
 
 ---------------------------------------------------------------------------------------------------
 
--- | Default configration holding unit.
+-- | The default configration holding @unit@.
 unitCoreConf :: CoreConf ()
 unitCoreConf = CoreConf {
   fullScreen = False,
@@ -25,7 +25,7 @@ unitCoreConf = CoreConf {
 
 ---------------------------------------------------------------------------------------------------
 
--- | This type class provide interface to multi media libraly.
+-- | This type class provides interface for multi media libraly.
 class CoreInterface a b m c | a -> b, a -> m, a -> c where
   bucephalusInit :: CoreConf a -> IO ()
   bucephalusQuit :: CoreConf a -> IO ()

@@ -11,19 +11,19 @@ import Graphics.UI.Bucephalus.Type.Events
 -- Definition of type class
 ---------------------------------------------------------------------------------------------------
 
--- | This type class provide simply game pad operation.
+-- | This type class provides simply game pad operation.
 class GamePad p where
-  -- | This function would return initial game pad.
+  -- | This function returns initial game pad.
   padInit :: p
 
-  -- | @inverpretPadEvent@ function provide make status of game pad.
+  -- | The @inverpretPadEvent@ function provides make status of game pad.
   interpretPadEvent :: p -> BucephalusEvent -> p
 
 ---------------------------------------------------------------------------------------------------
 -- Provide data type of standard game pad 
 ---------------------------------------------------------------------------------------------------
 
--- | @StandardPad@ data type provide game pad type, that has basic buttons.
+-- | @StandardPad@ data type provides game pad type, that has basic buttons.
 data StandardPad = StandardPad {
   buttonUp :: Integer,
   buttonDown :: Integer,
@@ -112,7 +112,7 @@ keyUpEvent pad _                    = pad
 ---------------------------------------------------------------------------------------------------
 
 -- | This function is utility for @StandardPad@.
---   e.g. : When pushing buttons @UP@ and @RIGHT@, this function would return (-1, 1).
+--   e.g. : When buttons are pushed @UP@ and @RIGHT@, this function returns (-1, 1).
 padToVector :: StandardPad -> (Int, Int)
 padToVector pad = (leftright pad, updown pad)
      
