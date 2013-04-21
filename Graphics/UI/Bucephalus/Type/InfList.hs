@@ -50,9 +50,8 @@ take :: PRE.Int -> List a -> [a]
 take i (List x) = PRE.take i x
 
 -- | The @head function for @InfList.List@.
-head :: List a -> Maybe a
-head (List []) = Nothing 
-head (List x) = Just $ PRE.head x
+head :: List a -> a
+head (List x) = PRE.head x
 
 -- | The @tail@ function for @InfList.List@.
 tail :: List a -> List a
